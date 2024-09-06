@@ -8,8 +8,20 @@ use Illuminate\Database\Eloquent\Model;
 class Attendnce extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'date',
+        'checkIN',
+        'checkOUT',
+        'employee_id'
+    ];
+
     public function attendanceAdjustments()
     {
         return $this->hasMany(EmployeeAttendanceAdjustment::class,'attendance_id');
+    }
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class);
     }
 }
