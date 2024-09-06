@@ -10,6 +10,23 @@ use function Laravel\Prompts\table;
 class Employee extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'name',
+        'email',
+        'birthdate',
+        'address',
+        'phone_number',
+        'hire_date',
+        'ssn',
+        'gender',
+        'nationality',
+        'position',
+        'Marital_status',
+        'salary',
+        'check_in_time',
+        'check_out_time'
+    ];
+
     public function department()
     {
         return $this->belongsTo(Department::class);
@@ -34,6 +51,11 @@ class Employee extends Model
     public function attendanceAdjustments()
     {
         return $this->hasMany(EmployeeAttendanceAdjustment::class,'employee_id');
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendnce::class);
     }
 
 
