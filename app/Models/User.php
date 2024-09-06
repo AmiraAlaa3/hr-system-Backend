@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+
     ];
 
     /**
@@ -42,4 +43,20 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+    public function employees()
+    {
+        return $this->belongsToMany(Employee::class,'hrs_empolyees');
+    }
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class,'users_groups');
+    }
+    public function subordinates()
+    {
+        return $this->hasMany(User::class, 'manager_id');
+    }
+    public function manager()
+    {
+        return $this->belongsTo(User::class, 'manager_id');
+    }
 }
