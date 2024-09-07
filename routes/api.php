@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\AttendanceCotroller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,3 +27,5 @@ Route::apiResource('employees', EmployeeController::class);
 // departments
 Route::get('departments/search', [DepartmentController::class, 'search']);
 Route::apiResource('departments',DepartmentController::class);
+// attendance
+Route::apiResource('attendances', AttendanceCotroller::class);
