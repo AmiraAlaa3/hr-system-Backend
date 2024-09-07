@@ -24,7 +24,8 @@ class Employee extends Model
         'Marital_status',
         'salary',
         'check_in_time',
-        'check_out_time'
+        'check_out_time',
+        'department_id'
     ];
 
     public function department()
