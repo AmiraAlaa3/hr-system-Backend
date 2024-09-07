@@ -26,4 +26,3 @@ Route::apiResource('employees', EmployeeController::class);
 // departments
 Route::get('departments/search', [DepartmentController::class, 'search']);
 Route::apiResource('departments',DepartmentController::class);
-
