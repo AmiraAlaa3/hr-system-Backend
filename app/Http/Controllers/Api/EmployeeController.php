@@ -174,4 +174,24 @@ class EmployeeController extends Controller
 
         return $extractedDate === $inputDate;
     }
+
+    public function search(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $name = $request->input('name');
+        $employee = Employee::where('name', 'LIKE', '%' . $name . '%')->get();
+
+        if ($employee->isEmpty()) {
+            return response()->json(['message' => 'Employee not found'], 404);
+        }
+
+        return EmployeeResource::collection($employee);
+    }
 }
