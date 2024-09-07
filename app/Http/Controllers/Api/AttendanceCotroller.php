@@ -60,6 +60,10 @@ class AttendanceCotroller extends Controller
     public function show(string $id)
     {
         //
+
+        $attendance = Attendnce::find($id);
+
+        return new AttendanceResource($attendance);
     }
 
     /**
@@ -68,6 +72,22 @@ class AttendanceCotroller extends Controller
     public function update(Request $request, string $id)
     {
         //
+        $request->validate([
+            'employee_id' => 'required|exists:employees,id',
+            'checkIN' => 'required|date_format:H:i:s',
+            'checkOUT' => 'required|date_format:H:i:s|after:attendance_time',
+            'date' => 'required|date',
+        ]);
+
+        $attendance = Attendnce::findOrFail($id);
+
+        $attendance->update([
+            'employee_id' => $request->employee_id,
+            'checkIN' => $request->checkIN,
+            'checkOUT' => $request->checkOUT,
+            'date' => $request->date,
+        ]);
+        return new AttendanceResource($attendance);
     }
 
     /**
@@ -76,5 +96,8 @@ class AttendanceCotroller extends Controller
     public function destroy(string $id)
     {
         //
+        $attendance = Attendnce::find($id);
+
+        $attendance->delete();
     }
 }
