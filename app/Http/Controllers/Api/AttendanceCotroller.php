@@ -22,11 +22,12 @@ class AttendanceCotroller extends Controller
      */
     public function index()
     {
-        $employees = Employee::with(['department','attendances'])->get();
-        // $employees = Employee::all();
-
+        $employees = Employee::with(['department', 'attendances'])->get();
         return EmployeeAttendanceResource::collection($employees);
-        //
+
+        // return only employlee have attendances
+        // $attendances = Attendnce::with(['employee.department'])->get();
+        // return AttendanceResource::collection($attendances);
     }
 
     /**
@@ -50,7 +51,7 @@ class AttendanceCotroller extends Controller
             'checkOUT' => $request->checkOUT,
             'date' => $request->date,
         ]);
-    
+
         return new AttendanceResource($attendance);
     }
 
@@ -59,10 +60,10 @@ class AttendanceCotroller extends Controller
      */
     public function show(string $id)
     {
-        //
-
         $attendance = Attendnce::find($id);
-
+        if (!$attendance) {
+            return response()->json(['message' => 'attendance not found'], 404);
+        }
         return new AttendanceResource($attendance);
     }
 
@@ -95,9 +96,11 @@ class AttendanceCotroller extends Controller
      */
     public function destroy(string $id)
     {
-        //
         $attendance = Attendnce::find($id);
-
+        if (!$attendance) {
+            return response()->json(['message' => 'attendance not found'], 404);
+        }
         $attendance->delete();
+        return response()->json(['message' => 'attendance deleted successfully'], 200);
     }
 }
