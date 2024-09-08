@@ -24,9 +24,14 @@ use Illuminate\Support\Facades\Route;
 
 //Login
 Route::post('login',[LoginController::class, 'login']);
-// employees
-Route::get('employees/search', [EmployeeController::class, 'search']);
-Route::apiResource('employees', EmployeeController::class);
-// departments
-Route::get('departments/search', [DepartmentController::class, 'search']);
-Route::apiResource('departments',DepartmentController::class);
+Route::middleware(['auth:sanctum'])->group(function () {
+    // employees
+    Route::get('employees/search', [EmployeeController::class, 'search']);
+    Route::apiResource('employees', EmployeeController::class);
+
+    // departments
+    Route::get('departments/search', [DepartmentController::class, 'search']);
+    Route::apiResource('departments',DepartmentController::class);
+
+    //Add all the routes Heeeerrrrrreeeeeeeeee pleeeeaaaasssss
+});
