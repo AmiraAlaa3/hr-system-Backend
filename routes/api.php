@@ -24,11 +24,10 @@ use Illuminate\Support\Facades\Route;
 // });
 
 
-// attendance
-Route::apiResource('attendances', AttendanceCotroller::class);
+
 
 //Login
-Route::post('login',[LoginController::class, 'login']);
+Route::post('login', [LoginController::class, 'login']);
 Route::middleware(['auth:sanctum'])->group(function () {
     // employees
     Route::get('employees/search', [EmployeeController::class, 'search']);
@@ -36,12 +35,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // departments
     Route::get('departments/search', [DepartmentController::class, 'search']);
-    Route::apiResource('departments',DepartmentController::class);
+    Route::apiResource('departments', DepartmentController::class);
 
     //Logout
-    Route::post('logout',[LoginController::class, 'logout']);
-    
+    Route::post('logout', [LoginController::class, 'logout']);
+
     //Add all the routes Heeeerrrrrreeeeeeeeee pleeeeaaaasssssee
+
+    // attendance
+    Route::apiResource('attendances', AttendanceCotroller::class);
 });
-
-
