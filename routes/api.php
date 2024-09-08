@@ -32,6 +32,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // departments
     Route::get('departments/search', [DepartmentController::class, 'search']);
     Route::apiResource('departments',DepartmentController::class);
-
-    //Add all the routes Heeeerrrrrreeeeeeeeee pleeeeaaaasssss
+    
+    //Logout
+    Route::post('logout',[LoginController::class, 'logout']);
+    
+    //Add all the routes Heeeerrrrrreeeeeeeeee pleeeeaaaasssssee
 });
