@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\AttendanceCotroller;
 use App\Http\Controllers\Api\Controller;
 use App\Http\Controllers\Api\LoginController;
 use Illuminate\Http\Request;
@@ -22,6 +23,10 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
+
+// attendance
+Route::apiResource('attendances', AttendanceCotroller::class);
+
 //Login
 Route::post('login',[LoginController::class, 'login']);
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -35,3 +40,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //Add all the routes Heeeerrrrrreeeeeeeeee pleeeeaaaasssss
 });
+
