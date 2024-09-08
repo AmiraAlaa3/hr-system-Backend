@@ -4,15 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\EmployeeAttendanceAdjustment;
 use App\Http\Resources\AttendanceResource;
-use App\Http\Resources\EmployeeAttendanceResource;
-use App\Models\Annual_Holidays;
-use App\Models\Casual_Holidays;
-use App\Models\User;
-use App\Models\Department;
-use App\Models\Employee;
-use App\Models\Weekend;
 use App\Models\Attendnce;
 
 class AttendanceCotroller extends Controller
@@ -22,12 +14,9 @@ class AttendanceCotroller extends Controller
      */
     public function index()
     {
-        $employees = Employee::with(['department', 'attendances'])->get();
-        return EmployeeAttendanceResource::collection($employees);
-
-        // return only employlee have attendances
-        // $attendances = Attendnce::with(['employee.department'])->get();
-        // return AttendanceResource::collection($attendances);
+       //return only employlee have attendances
+        $attendances = Attendnce::with(['employee.department'])->get();
+        return AttendanceResource::collection($attendances);
     }
 
     /**

@@ -44,10 +44,6 @@ class Employee extends Model
     {
         return $this->belongsToMany(Weekend::class,'employee_weekend');
     }
-    public function casual_holidays()
-    {
-        return $this->hasMany(Casual_Holidays::class, 'employee_id');
-    }
 
     public function attendanceAdjustments()
     {
