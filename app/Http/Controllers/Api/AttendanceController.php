@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\EmployeeAttendanceAdjustment;
 use App\Http\Resources\AttendanceResource;
-use App\Http\Resources\EmployeeAttendanceResource;
 use App\Models\Annual_Holidays;
 use App\Models\Casual_Holidays;
 use App\Models\User;
@@ -14,6 +13,8 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Weekend;
 use App\Models\Attendnce;
+use Illuminate\Support\Facades\Validator;
+
 
 class AttendanceController extends Controller
 {
@@ -22,11 +23,16 @@ class AttendanceController extends Controller
      */
     public function index()
     {
+
         $employees = Employee::with(['department','attendances'])->get();
         // $employees = Employee::all();
 
         return EmployeeAttendanceResource::collection($employees);
-        //
+        
+       //return only employee have attendances
+        $attendances = Attendnce::with(['employee.department'])->get();
+        return AttendanceResource::collection($attendances);
+
     }
 
     /**
@@ -50,7 +56,9 @@ class AttendanceController extends Controller
             'checkOUT' => $request->checkOUT,
             'date' => $request->date,
         ]);
+
     
+
         return new AttendanceResource($attendance);
     }
 
@@ -59,9 +67,16 @@ class AttendanceController extends Controller
      */
     public function show(string $id)
     {
+
         //
 
         $attendance = Attendnce::find($id);
+
+
+        $attendance = Attendnce::find($id);
+        if (!$attendance) {
+            return response()->json(['message' => 'attendance not found'], 404);
+        }
 
         return new AttendanceResource($attendance);
     }
@@ -95,13 +110,22 @@ class AttendanceController extends Controller
      */
     public function destroy(string $id)
     {
-        //
-        $attendance = Attendnce::find($id);
 
+        //
+
+        $attendance = Attendnce::find($id);
+        if (!$attendance) {
+            return response()->json(['message' => 'attendance not found'], 404);
+        }
         $attendance->delete();
+        return response()->json(['message' => 'attendance deleted successfully'], 200);
     }
 
     // search by name of employee and department name
+
+
+    
+
 
     public function search (request $request){
 
@@ -140,6 +164,7 @@ class AttendanceController extends Controller
     
         return AttendanceResource::collection($attendances);
     }
+
 
     // filter attendance by date
 
