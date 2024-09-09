@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
-use App\Http\Controllers\Api\AttendanceCotroller;
+use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\Controller;
 use App\Http\Controllers\Api\LoginController;
 use Illuminate\Http\Request;
@@ -43,5 +43,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //Add all the routes Heeeerrrrrreeeeeeeeee pleeeeaaaasssssee
 
     // attendance
-    Route::apiResource('attendances', AttendanceCotroller::class);
+    Route::get('attendances/search', [AttendanceController::class, 'search']);
+    Route::get('attendances/filter', [AttendanceController::class, 'filterByDate']);
+    Route::apiResource('attendances', AttendanceController::class);
 });

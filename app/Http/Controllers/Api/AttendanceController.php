@@ -6,15 +6,16 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\AttendanceResource;
 use App\Models\Attendnce;
+use Illuminate\Support\Facades\Validator;
 
-class AttendanceCotroller extends Controller
+class AttendanceController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-       //return only employlee have attendances
+       //return only employee have attendances
         $attendances = Attendnce::with(['employee.department'])->get();
         return AttendanceResource::collection($attendances);
     }
@@ -91,5 +92,61 @@ class AttendanceCotroller extends Controller
         }
         $attendance->delete();
         return response()->json(['message' => 'attendance deleted successfully'], 200);
+    }
+
+    public function search (request $request){
+
+        $validator = Validator::make($request->all(), [
+            'employee_name' => 'nullable|string|max:255',
+            'department_name' => 'nullable|string|max:255',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+    
+        $employeeName = $request->input('employee_name');
+        $departmentName = $request->input('department_name');
+    
+        $query = Attendnce::query();
+    
+    
+        if ($employeeName) {
+            $query->whereHas('employee', function($q) use ($employeeName) {
+                $q->where('name', 'LIKE', '%' . $employeeName . '%');
+            });
+        }
+    
+        if ($departmentName) {
+            $query->whereHas('employee.department', function($q) use ($departmentName) {
+                $q->where('name', 'LIKE', '%' . $departmentName . '%');
+            });
+        }
+    
+        $attendances = $query->get();
+    
+        if ($attendances->isEmpty()) {
+            return response()->json(['message' => 'Attendance not found'], 404);
+        }
+    
+        return AttendanceResource::collection($attendances);
+    }
+
+    public function filterByDate (request $request){
+        $request->validate([
+            "start_date"=> 'required|date|before_or_equal:end_date',
+            "end_date"=>'required|date|after_or_equal:start_date'
+        ]);
+
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        if(!$startDate || !$endDate){
+            return response()->json(['message' => 'please enter correct date']);
+        }
+
+        $attendance = Attendnce::whereBetween('date',[$startDate,$endDate])->get();
+
+        return AttendanceResource::collection($attendance);
     }
 }
