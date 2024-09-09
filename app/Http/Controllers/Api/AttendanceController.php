@@ -15,7 +15,7 @@ use App\Models\Employee;
 use App\Models\Weekend;
 use App\Models\Attendnce;
 
-class AttendanceCotroller extends Controller
+class AttendanceController extends Controller
 {
     /**
      * Display a listing of the resource.
