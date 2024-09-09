@@ -100,4 +100,64 @@ class AttendanceCotroller extends Controller
 
         $attendance->delete();
     }
+
+    // search by name of employee and department name
+
+    public function search (request $request){
+
+        $validator = Validator::make($request->all(), [
+            'employee_name' => 'nullable|string|max:255',
+            'department_name' => 'nullable|string|max:255',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+    
+        $employeeName = $request->input('employee_name');
+        $departmentName = $request->input('department_name');
+    
+        $query = Attendnce::query();
+    
+    
+        if ($employeeName) {
+            $query->whereHas('employee', function($q) use ($employeeName) {
+                $q->where('name', 'LIKE', '%' . $employeeName . '%');
+            });
+        }
+    
+        if ($departmentName) {
+            $query->whereHas('employee.department', function($q) use ($departmentName) {
+                $q->where('name', 'LIKE', '%' . $departmentName . '%');
+            });
+        }
+    
+        $attendances = $query->get();
+    
+        if ($attendances->isEmpty()) {
+            return response()->json(['message' => 'Attendance not found'], 404);
+        }
+    
+        return AttendanceResource::collection($attendances);
+    }
+
+    // filter attendance by date
+
+    public function filterByDate (request $request){
+        $request->validate([
+            "start_date"=> 'required|date|before_or_equal:end_date',
+            "end_date"=>'required|date|after_or_equal:start_date'
+        ]);
+
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        if(!$startDate || !$endDate){
+            return response()->json(['message' => 'please enter correct date']);
+        }
+
+        $attendance = Attendnce::whereBetween('date',[$startDate,$endDate])->get();
+
+        return AttendanceResource::collection($attendance);
+    }
 }
