@@ -4,19 +4,35 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\EmployeeAttendanceAdjustment;
 use App\Http\Resources\AttendanceResource;
+use App\Models\Annual_Holidays;
+use App\Models\Casual_Holidays;
+use App\Models\User;
+use App\Models\Department;
+use App\Models\Employee;
+use App\Models\Weekend;
 use App\Models\Attendnce;
+use Illuminate\Support\Facades\Validator;
 
-class AttendanceCotroller extends Controller
+
+class AttendanceController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-       //return only employlee have attendances
+
+        $employees = Employee::with(['department','attendances'])->get();
+        // $employees = Employee::all();
+
+        return EmployeeAttendanceResource::collection($employees);
+        
+       //return only employee have attendances
         $attendances = Attendnce::with(['employee.department'])->get();
         return AttendanceResource::collection($attendances);
+
     }
 
     /**
@@ -41,6 +57,8 @@ class AttendanceCotroller extends Controller
             'date' => $request->date,
         ]);
 
+    
+
         return new AttendanceResource($attendance);
     }
 
@@ -49,10 +67,17 @@ class AttendanceCotroller extends Controller
      */
     public function show(string $id)
     {
+
+        //
+
+        $attendance = Attendnce::find($id);
+
+
         $attendance = Attendnce::find($id);
         if (!$attendance) {
             return response()->json(['message' => 'attendance not found'], 404);
         }
+
         return new AttendanceResource($attendance);
     }
 
@@ -85,11 +110,79 @@ class AttendanceCotroller extends Controller
      */
     public function destroy(string $id)
     {
+
+        //
+
         $attendance = Attendnce::find($id);
         if (!$attendance) {
             return response()->json(['message' => 'attendance not found'], 404);
         }
         $attendance->delete();
         return response()->json(['message' => 'attendance deleted successfully'], 200);
+    }
+
+    // search by name of employee and department name
+
+
+    
+
+
+    public function search (request $request){
+
+        $validator = Validator::make($request->all(), [
+            'employee_name' => 'nullable|string|max:255',
+            'department_name' => 'nullable|string|max:255',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+    
+        $employeeName = $request->input('employee_name');
+        $departmentName = $request->input('department_name');
+    
+        $query = Attendnce::query();
+    
+    
+        if ($employeeName) {
+            $query->whereHas('employee', function($q) use ($employeeName) {
+                $q->where('name', 'LIKE', '%' . $employeeName . '%');
+            });
+        }
+    
+        if ($departmentName) {
+            $query->whereHas('employee.department', function($q) use ($departmentName) {
+                $q->where('name', 'LIKE', '%' . $departmentName . '%');
+            });
+        }
+    
+        $attendances = $query->get();
+    
+        if ($attendances->isEmpty()) {
+            return response()->json(['message' => 'Attendance not found'], 404);
+        }
+    
+        return AttendanceResource::collection($attendances);
+    }
+
+
+    // filter attendance by date
+
+    public function filterByDate (request $request){
+        $request->validate([
+            "start_date"=> 'required|date|before_or_equal:end_date',
+            "end_date"=>'required|date|after_or_equal:start_date'
+        ]);
+
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        if(!$startDate || !$endDate){
+            return response()->json(['message' => 'please enter correct date']);
+        }
+
+        $attendance = Attendnce::whereBetween('date',[$startDate,$endDate])->get();
+
+        return AttendanceResource::collection($attendance);
     }
 }
