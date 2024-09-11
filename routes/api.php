@@ -52,14 +52,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
 
-
-
+// attendances
+Route::apiResource('attendances', AttendanceController::class);
+Route::get('attendances/search', [AttendanceController::class, 'search']);
+Route::get('attendances/filter', [AttendanceController::class, 'filterByDate']);
+// employees
+Route::get('employees/search', [EmployeeController::class, 'search']);
+Route::apiResource('employees', EmployeeController::class);
 //Login
 Route::post('login', [LoginController::class, 'login']);
 Route::middleware(['auth:sanctum'])->group(function () {
-    // employees
-    Route::get('employees/search', [EmployeeController::class, 'search']);
-    Route::apiResource('employees', EmployeeController::class);
 
     // departments
     Route::get('departments/search', [DepartmentController::class, 'search']);
@@ -71,8 +73,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //Add all the routes Heeeerrrrrreeeeeeeeee pleeeeaaaasssssee
 
     // attendance
-    Route::get('attendances/search', [AttendanceController::class, 'search']);
-    Route::get('attendances/filter', [AttendanceController::class, 'filterByDate']);
-    Route::apiResource('attendances', AttendanceController::class);
+
 });
+
 

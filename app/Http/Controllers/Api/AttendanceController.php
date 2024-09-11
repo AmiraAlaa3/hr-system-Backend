@@ -26,8 +26,6 @@ class AttendanceController extends Controller
 
         $employees = Employee::with(['department','attendances'])->get();
         // $employees = Employee::all();
-
-        return EmployeeAttendanceResource::collection($employees);
         
        //return only employee have attendances
         $attendances = Attendnce::with(['employee.department'])->get();
@@ -43,13 +41,24 @@ class AttendanceController extends Controller
         //
         $request->validate([
             'employee_id' => 'required|exists:employees,id',
-            'checkIN' => 'required|date_format:H:i:s',
-            'checkOUT' => 'required|date_format:H:i:s|after:attendance_time',
-            'date' => 'required|date',
+            'checkIN' => 'required|date_format:H:i',
+            'checkOUT' => 'required|date_format:H:i|after:checkIN',
+            'date' => [
+                'required',
+                'date',
+                function ($attribute, $value, $fail) use ($request) {
+                    $exists = \DB::table('attendnces')
+                        ->where('employee_id', $request->employee_id)
+                        ->where('date', $value)
+                        ->exists();
+                        
+                    if ($exists) {
+                        $fail('Attendance for this date already exists for this employee.');
+                    }
+                },
+            ],
         ]);
-
-        // $employee = Employee::findOrFail($request->employee_id);
-        // $department_id = $employee->department_id;
+        
         $attendance = Attendnce::create([
             'employee_id' => $request->employee_id,
             'checkIN' => $request->checkIN,
@@ -89,8 +98,8 @@ class AttendanceController extends Controller
         //
         $request->validate([
             'employee_id' => 'required|exists:employees,id',
-            'checkIN' => 'required|date_format:H:i:s',
-            'checkOUT' => 'required|date_format:H:i:s|after:attendance_time',
+            'checkIN' => 'required|date_format:H:i',
+            'checkOUT' => 'required|date_format:H:i|after:attendance_time',
             'date' => 'required|date',
         ]);
 
