@@ -12,7 +12,9 @@ class Attendnce extends Model
         'date',
         'checkIN',
         'checkOUT',
-        'employee_id'
+        'employee_id',
+        'work_days'
+
     ];
 
     public function attendanceAdjustments()

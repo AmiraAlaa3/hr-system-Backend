@@ -15,14 +15,14 @@ use App\Models\Weekend;
 
 class EmployeeController extends Controller
 {
-    public function index()
+    public function index($id)
     {
     //    $employees = Employee::with('department')->get();
         // $employees = Employee::with('weekend')->get();
         // $employees = Employee::with('casual_holidays')->get();
-        // $employees = Employee::with(['attendanceAdjustments.attendance'])->get();
-
-        // return $employees;
+        $employees = Employee::with(['attendanceAdjustments.adjustment'])
+                            ->findOrFail($id);
+        return $employees;
     }
     // public function index()
     // {
