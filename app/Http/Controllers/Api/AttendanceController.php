@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-
+use App\Imports\AttendancesImport;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\EmployeeAttendanceAdjustment;
@@ -41,8 +42,8 @@ class AttendanceController extends Controller
         //
         $request->validate([
             'employee_id' => 'required|exists:employees,id',
-            'checkIN' => 'required|date_format:H:i',
-            'checkOUT' => 'required|date_format:H:i|after:checkIN',
+            'checkIN' => 'required|time',
+            'checkOUT' => 'required|time|after:checkIN',
             'date' => [
                 'required',
                 'date',
@@ -98,8 +99,8 @@ class AttendanceController extends Controller
         //
         $request->validate([
             'employee_id' => 'required|exists:employees,id',
-            'checkIN' => 'required|date_format:H:i',
-            'checkOUT' => 'required|date_format:H:i|after:attendance_time',
+            'checkIN' => 'required|time',
+            'checkOUT' => 'required|time|after:attendance_time',
             'date' => 'required|date',
         ]);
 
@@ -193,5 +194,20 @@ class AttendanceController extends Controller
         $attendance = Attendnce::whereBetween('date',[$startDate,$endDate])->get();
 
         return AttendanceResource::collection($attendance);
+    }
+
+    // import file excel
+
+    public function ExcelImport(Request $request){
+          $request->validate([
+            'import_file'=>[
+                'required',
+                'file',
+            ],
+          ]);
+          Excel::import(new AttendancesImport, $request->file('import_file'));
+
+        //   $attendance = Attendnce::all();
+          return response()->json(['message' => 'File imported successfully.']);
     }
 }
