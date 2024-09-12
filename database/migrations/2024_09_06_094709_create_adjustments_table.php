@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('houres');
             $table->string('reason');
             $table->enum('status',['approved','Unapproved','New']);
+            $table->enum('type',['bouns','dedeuction']);
             $table->string('approvedBY');
             $table->timestamps();
         });
