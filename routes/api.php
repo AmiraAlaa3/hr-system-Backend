@@ -56,6 +56,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::apiResource('attendances', AttendanceController::class);
 Route::get('attendances/search', [AttendanceController::class, 'search']);
 Route::get('attendances/filter', [AttendanceController::class, 'filterByDate']);
+Route::post('attendances/ExcelImport', [AttendanceController::class, 'ExcelImport']);
 // employees
 Route::get('employees/search', [EmployeeController::class, 'search']);
 Route::apiResource('employees', EmployeeController::class);
