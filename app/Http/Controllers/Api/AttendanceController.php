@@ -39,8 +39,8 @@ class AttendanceController extends Controller
         //
         $request->validate([
             'employee_id' => 'required|exists:employees,id',
-            'checkIN' => 'required|time',
-            'checkOUT' => 'required|time|after:checkIN',
+            'checkIN' => ['required', 'regex:/^(?:2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]$/'],
+            'checkOUT' => ['required', 'regex:/^(?:2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]$/', 'after:checkIN'],
             'date' => [
                 'required',
                 'date',
@@ -88,8 +88,8 @@ class AttendanceController extends Controller
     {
         $request->validate([
             'employee_id' => 'required|exists:employees,id',
-            'checkIN' => 'required|time',
-            'checkOUT' => 'required|time|after:attendance_time',
+            'checkIN' => ['required', 'regex:/^(?:2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]$/'],
+            'checkOUT' => ['required', 'regex:/^(?:2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]$/', 'after:checkIN'],
             'date' => 'required|date',
         ]);
 
