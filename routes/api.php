@@ -2,8 +2,13 @@
 
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
+
 use App\Http\Controllers\Api\HolidaysController;
 use App\Http\Controllers\Api\WeekendController;
+use App\Http\Controllers\Api\SalariesController;
+use App\Http\Controllers\Api\AttendanceController;
+use App\Http\Controllers\Api\Controller;
+use App\Http\Controllers\Api\LoginController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,20 +23,61 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+
+
+
+
+//Login
+Route::post('login', [LoginController::class, 'login']);
+Route::middleware(['auth:sanctum'])->group(function () {
+    // employees
+    Route::get('employees/search', [EmployeeController::class, 'search']);
+    Route::apiResource('employees', EmployeeController::class);
+
+    // departments
+    Route::get('departments/search', [DepartmentController::class, 'search']);
+    Route::apiResource('departments', DepartmentController::class);
+
+    //Logout
+    Route::post('logout', [LoginController::class, 'logout']);
+
+    //Add all the routes Heeeerrrrrreeeeeeeeee pleeeeaaaasssssee
+
+    // attendance
+    Route::get('attendances/search', [AttendanceController::class, 'search']);
+    Route::get('attendances/filter', [AttendanceController::class, 'filterByDate']);
+    Route::apiResource('attendances', AttendanceController::class);
 });
 
+
+
+
+// attendances
+Route::apiResource('attendances', AttendanceController::class);
+Route::get('attendances/search', [AttendanceController::class, 'search']);
+Route::get('attendances/filter', [AttendanceController::class, 'filterByDate']);
 // employees
+
 Route::get('employees/search', [EmployeeController::class, 'search']);
 Route::apiResource('employees', EmployeeController::class);
+
+// salaries
+Route::get('salarys', [SalariesController::class, 'index']);
+Route::get('salary/search', [SalariesController::class, 'search']);
+Route::get('salary/search-by-month-year', [SalariesController::class, 'searchByMonthAndYear']);
+Route::get('salary/{id}', [SalariesController::class, 'show']);
+Route::patch('salary/{id}', [SalariesController::class, 'update']);
+
+Route::apiResource('salary', SalariesController::class);
+
+
 // departments
 Route::get('departments/search', [DepartmentController::class, 'search']);
 Route::apiResource('departments',DepartmentController::class);
-
-//holidays
-// Route::get('holidays/index',[HolidaysController::class, 'index']);
-// Route::apiResource('holidays',HolidaysController::class);
 
 
 Route::apiResource('holidays', HolidaysController::class);
@@ -41,11 +87,21 @@ Route::apiResource('holidays', HolidaysController::class);
 
 Route::apiResource('weekends',WeekendController::class);
 
+//Login
+Route::post('login', [LoginController::class, 'login']);
+Route::middleware(['auth:sanctum'])->group(function () {
+
+    // departments
+    Route::get('departments/search', [DepartmentController::class, 'search']);
+    Route::apiResource('departments', DepartmentController::class);
+
+    //Logout
+    Route::post('logout', [LoginController::class, 'logout']);
+
+    //Add all the routes Heeeerrrrrreeeeeeeeee pleeeeaaaasssssee
+
+    // attendance
+
+});
 
 
-// Route::apiResource('holidays', HolidayController::class);
-
-
-// Route::get('/holidays/{id}', [HolidaysController::class, 'show']);
-// Route::put('/holidays/{id}', [HolidaysController::class, 'update']);
-// Route::delete('/holidays/{id}', [HolidaysController::class, 'destroy']);

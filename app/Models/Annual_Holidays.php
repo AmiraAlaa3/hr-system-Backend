@@ -9,6 +9,7 @@ class Annual_Holidays extends Model
 {
     use HasFactory;
     protected $table = 'annual_holidays';
+
     protected $fillable = [
         'id',
         'date',
@@ -18,6 +19,7 @@ class Annual_Holidays extends Model
         'to_date',
         'numberOfDays',
     ];
+
     public function employees()
     {
         return $this->belongsToMany(Employee::class,'employee_annual_holiyday');
