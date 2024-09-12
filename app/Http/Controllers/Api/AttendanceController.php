@@ -14,6 +14,7 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Weekend;
 use App\Models\Attendnce;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -24,10 +25,6 @@ class AttendanceController extends Controller
      */
     public function index()
     {
-
-        $employees = Employee::with(['department','attendances'])->get();
-        // $employees = Employee::all();
-        
        //return only employee have attendances
         $attendances = Attendnce::with(['employee.department'])->get();
         return AttendanceResource::collection($attendances);
@@ -42,24 +39,24 @@ class AttendanceController extends Controller
         //
         $request->validate([
             'employee_id' => 'required|exists:employees,id',
-            'checkIN' => 'required|time',
-            'checkOUT' => 'required|time|after:checkIN',
+            'checkIN' => ['required', 'regex:/^(?:2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]$/'],
+            'checkOUT' => ['required', 'regex:/^(?:2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]$/', 'after:checkIN'],
             'date' => [
                 'required',
                 'date',
                 function ($attribute, $value, $fail) use ($request) {
-                    $exists = \DB::table('attendnces')
+                    $exists = DB::table('attendnces')
                         ->where('employee_id', $request->employee_id)
                         ->where('date', $value)
                         ->exists();
-                        
+
                     if ($exists) {
                         $fail('Attendance for this date already exists for this employee.');
                     }
                 },
             ],
         ]);
-        
+
         $attendance = Attendnce::create([
             'employee_id' => $request->employee_id,
             'checkIN' => $request->checkIN,
@@ -67,7 +64,7 @@ class AttendanceController extends Controller
             'date' => $request->date,
         ]);
 
-    
+
 
         return new AttendanceResource($attendance);
     }
@@ -77,17 +74,10 @@ class AttendanceController extends Controller
      */
     public function show(string $id)
     {
-
-        //
-
-        $attendance = Attendnce::find($id);
-
-
         $attendance = Attendnce::find($id);
         if (!$attendance) {
             return response()->json(['message' => 'attendance not found'], 404);
         }
-
         return new AttendanceResource($attendance);
     }
 
@@ -96,11 +86,10 @@ class AttendanceController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
         $request->validate([
             'employee_id' => 'required|exists:employees,id',
-            'checkIN' => 'required|time',
-            'checkOUT' => 'required|time|after:attendance_time',
+            'checkIN' => ['required', 'regex:/^(?:2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]$/'],
+            'checkOUT' => ['required', 'regex:/^(?:2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]$/', 'after:checkIN'],
             'date' => 'required|date',
         ]);
 
@@ -120,9 +109,6 @@ class AttendanceController extends Controller
      */
     public function destroy(string $id)
     {
-
-        //
-
         $attendance = Attendnce::find($id);
         if (!$attendance) {
             return response()->json(['message' => 'attendance not found'], 404);
@@ -132,46 +118,41 @@ class AttendanceController extends Controller
     }
 
     // search by name of employee and department name
-
-
-    
-
-
     public function search (request $request){
 
         $validator = Validator::make($request->all(), [
             'employee_name' => 'nullable|string|max:255',
             'department_name' => 'nullable|string|max:255',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
-    
+
         $employeeName = $request->input('employee_name');
         $departmentName = $request->input('department_name');
-    
+
         $query = Attendnce::query();
-    
-    
+
+
         if ($employeeName) {
             $query->whereHas('employee', function($q) use ($employeeName) {
                 $q->where('name', 'LIKE', '%' . $employeeName . '%');
             });
         }
-    
+
         if ($departmentName) {
             $query->whereHas('employee.department', function($q) use ($departmentName) {
                 $q->where('name', 'LIKE', '%' . $departmentName . '%');
             });
         }
-    
+
         $attendances = $query->get();
-    
+
         if ($attendances->isEmpty()) {
             return response()->json(['message' => 'Attendance not found'], 404);
         }
-    
+
         return AttendanceResource::collection($attendances);
     }
 

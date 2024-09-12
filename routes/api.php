@@ -31,29 +31,6 @@ use Illuminate\Support\Facades\Route;
 
 
 
-//Login
-Route::post('login', [LoginController::class, 'login']);
-Route::middleware(['auth:sanctum'])->group(function () {
-    // employees
-    Route::get('employees/search', [EmployeeController::class, 'search']);
-    Route::apiResource('employees', EmployeeController::class);
-
-    // departments
-    Route::get('departments/search', [DepartmentController::class, 'search']);
-    Route::apiResource('departments', DepartmentController::class);
-
-    //Logout
-    Route::post('logout', [LoginController::class, 'logout']);
-
-    //Add all the routes Heeeerrrrrreeeeeeeeee pleeeeaaaasssssee
-
-    // attendance
-    Route::get('attendances/search', [AttendanceController::class, 'search']);
-    Route::get('attendances/filter', [AttendanceController::class, 'filterByDate']);
-    Route::apiResource('attendances', AttendanceController::class);
-});
-
-
 
 
 // attendances
@@ -82,19 +59,11 @@ Route::apiResource('departments',DepartmentController::class);
 
 
 Route::apiResource('holidays', HolidaysController::class);
-
-
-
-
 Route::apiResource('weekends',WeekendController::class);
 
 //Login
 Route::post('login', [LoginController::class, 'login']);
 Route::middleware(['auth:sanctum'])->group(function () {
-
-    // departments
-    Route::get('departments/search', [DepartmentController::class, 'search']);
-    Route::apiResource('departments', DepartmentController::class);
 
     //Logout
     Route::post('logout', [LoginController::class, 'logout']);

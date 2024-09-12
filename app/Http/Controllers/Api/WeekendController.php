@@ -35,7 +35,7 @@ class WeekendController extends Controller
         $validateDate = Validator::make($request->all(),[
             'title' => 'required|string|max:255',
             'date' => 'required|date',
-            // 'days' => 'required|string',
+            'days' => 'required|string',
           ]);
 
           if($validateDate->fails()){
@@ -59,7 +59,7 @@ class WeekendController extends Controller
     /**
      * Update the specified resource in storage.
      */
-      
+
 
     public function update(Request $request, string $id)
     {
@@ -67,7 +67,7 @@ class WeekendController extends Controller
         $validateDate = Validator::make($request->all(),[
             'title' => 'required|string|max:255',
             'date' => 'required|date',
-            'days' => 'required|enum',
+            'days' => 'required|string',
           ]);
 
           if($validateDate->fails()){
@@ -88,9 +88,9 @@ class WeekendController extends Controller
         if (!$weekend) {
             return response()->json(['message' => 'weekend not found'], 404);
         }
-    
+
         $weekend->delete();
-    
+
         return response()->json(['message' => 'weekend deleted successfully']);
     }
 }
