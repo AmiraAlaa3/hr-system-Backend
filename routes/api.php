@@ -3,12 +3,12 @@
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 
+use App\Http\Controllers\Api\HolidaysController;
+use App\Http\Controllers\Api\WeekendController;
 use App\Http\Controllers\Api\SalariesController;
-
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\Controller;
 use App\Http\Controllers\Api\LoginController;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -79,6 +79,14 @@ Route::apiResource('salary', SalariesController::class);
 Route::get('departments/search', [DepartmentController::class, 'search']);
 Route::apiResource('departments',DepartmentController::class);
 
+
+Route::apiResource('holidays', HolidaysController::class);
+
+
+
+
+Route::apiResource('weekends',WeekendController::class);
+
 //Login
 Route::post('login', [LoginController::class, 'login']);
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -95,4 +103,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // attendance
 
 });
+
 
