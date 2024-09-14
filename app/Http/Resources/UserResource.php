@@ -14,7 +14,7 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        
+
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -40,6 +40,7 @@ class UserResource extends JsonResource
                 }
 
                 return [
+                    'id' => $group->id,
                     'name' => $group->name,
                     'permissions' => $permissions,
                 ];
