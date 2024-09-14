@@ -24,16 +24,16 @@ class DepartmentController extends Controller
      */
     public function store(Request $request)
     {
-       $validateDate = Validator::make($request->all(),[
-         'name' => 'required|string|max:255',
-       ]);
+        $validateDate = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+        ]);
 
-       if($validateDate->fails()){
-          return response()->json($validateDate->errors(), 400);
-       }
+        if ($validateDate->fails()) {
+            return response()->json($validateDate->errors(), 400);
+        }
 
-       $department = Department::create($validateDate->validated());
-       return new DepartmentResource($department);
+        $department = Department::create($validateDate->validated());
+        return new DepartmentResource($department);
     }
 
     /**
@@ -51,16 +51,16 @@ class DepartmentController extends Controller
     public function update(Request $request, string $id)
     {
         $department = Department::findOrfail($id);
-        $validateDate = Validator::make($request->all(),[
+        $validateDate = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-          ]);
+        ]);
 
-          if($validateDate->fails()){
-             return response()->json($validateDate->errors(), 400);
-          }
+        if ($validateDate->fails()) {
+            return response()->json($validateDate->errors(), 400);
+        }
 
-          $department->update($validateDate->validated());
-          return new DepartmentResource($department);
+        $department->update($validateDate->validated());
+        return new DepartmentResource($department);
     }
 
     /**

@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\Controller;
 use App\Http\Controllers\Api\LoginController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,9 @@ use Illuminate\Support\Facades\Route;
 //Login
 Route::post('login', [LoginController::class, 'login']);
 Route::middleware(['auth:sanctum'])->group(function () {
+    //Dashboard
+    Route::get('dashboard', [DashboardController::class, 'countDashboard']);
+
     // employees
     Route::get('employees/search', [EmployeeController::class, 'search']);
     Route::apiResource('employees', EmployeeController::class);
@@ -38,15 +42,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('departments/search', [DepartmentController::class, 'search']);
     Route::apiResource('departments', DepartmentController::class);
 
+    // attendance
+    Route::get('attendances/search', [AttendanceController::class, 'search']);
+    Route::get('attendances/filter', [AttendanceController::class, 'filterByDate']);
+    Route::apiResource('attendances', AttendanceController::class);
+
     //Logout
     Route::post('logout', [LoginController::class, 'logout']);
 
     //Add all the routes Heeeerrrrrreeeeeeeeee pleeeeaaaasssssee
 
-    // attendance
-    Route::get('attendances/search', [AttendanceController::class, 'search']);
-    Route::get('attendances/filter', [AttendanceController::class, 'filterByDate']);
-    Route::apiResource('attendances', AttendanceController::class);
 });
 
 
@@ -75,5 +80,3 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // attendance
 
 });
-
-

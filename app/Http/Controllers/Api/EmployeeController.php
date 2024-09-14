@@ -43,7 +43,7 @@ class EmployeeController extends Controller
             'address' => 'required|string|max:255',
             'phone_number' => 'required|string|max:11',
             'hire_date' => 'required|date',
-           'ssn' => [
+            'ssn' => [
                 'required',
                 'numeric',
                 'unique:employees',
@@ -69,7 +69,6 @@ class EmployeeController extends Controller
         $validatedData = $validatedData->validated();
         $employee = Employee::create($validatedData);
         return new EmployeeResource($employee);
-
     }
 
     /**
@@ -77,8 +76,8 @@ class EmployeeController extends Controller
      */
     public function show(string $id)
     {
-       $employee = Employee::findOrFail($id);
-       return new EmployeeResource($employee);
+        $employee = Employee::findOrFail($id);
+        return new EmployeeResource($employee);
     }
 
     /**
