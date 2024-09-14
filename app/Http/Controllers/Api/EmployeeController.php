@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\EmployeeResource;
+use App\Http\Resources\SalariesResource;
 use App\Models\Employee;
 use Carbon\Carbon;
+use App\Models\EmployeeAttendanceAdjustment;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -193,4 +195,5 @@ class EmployeeController extends Controller
 
         return EmployeeResource::collection($employee);
     }
+
 }

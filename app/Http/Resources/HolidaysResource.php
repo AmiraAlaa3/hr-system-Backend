@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class DepartmentResource extends JsonResource
+class HolidaysResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,9 +16,12 @@ class DepartmentResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'employees' => EmployeeResource::collection($this->employees),
-            'employees_count' => $this->employees->count(),
+            'date' => $this->date,
+            'title'=> $this->title,
+            'description'=> $this->description,
+            'from_date'=> $this->from_date,
+            'to_date'=> $this->to_date,
+            'numberOfDays'=> $this->numberOfDays,
         ];
     }
 }
