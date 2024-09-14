@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\SalariesController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\Controller;
 use App\Http\Controllers\Api\LoginController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\GroupController;
 use Illuminate\Http\Request;
@@ -30,56 +31,46 @@ use Illuminate\Support\Facades\Route;
 // });
 
 
-
-
-
-
-
-// attendances
-Route::apiResource('attendances', AttendanceController::class);
-Route::get('attendances/search', [AttendanceController::class, 'search']);
-Route::get('attendances/filter', [AttendanceController::class, 'filterByDate']);
-Route::post('attendances/ExcelImport', [AttendanceController::class, 'ExcelImport']);
-// employees
-
-Route::get('employees/search', [EmployeeController::class, 'search']);
-Route::apiResource('employees', EmployeeController::class);
-
-// salaries
-Route::get('salarys', [SalariesController::class, 'index']);
-Route::get('salary/search', [SalariesController::class, 'search']);
-Route::get('salary/search-by-month-year', [SalariesController::class, 'searchByMonthAndYear']);
-Route::get('salary/{id}', [SalariesController::class, 'show']);
-Route::patch('salary/{id}', [SalariesController::class, 'update']);
-
-Route::apiResource('salary', SalariesController::class);
-
-
-// departments
-Route::get('departments/search', [DepartmentController::class, 'search']);
-Route::apiResource('departments',DepartmentController::class);
-
-
-Route::apiResource('holidays', HolidaysController::class);
-Route::apiResource('weekends',WeekendController::class);
-
-// user
-
-Route::apiResource('users', UserController::class);
-// group
-Route::apiResource('groups', GroupController::class);
-
 //Login
 Route::post('login', [LoginController::class, 'login']);
 Route::middleware(['auth:sanctum'])->group(function () {
+    //Dashboard
+    Route::get('dashboard', [DashboardController::class, 'countDashboard']);
+
+    // employees
+
+    Route::get('employees/search', [EmployeeController::class, 'search']);
+    Route::apiResource('employees', EmployeeController::class);
+
+    // departments
+    Route::get('departments/search', [DepartmentController::class, 'search']);
+    Route::apiResource('departments', DepartmentController::class);
+  
+    // attendances
+    Route::apiResource('attendances', AttendanceController::class);
+    Route::get('attendances/search', [AttendanceController::class, 'search']);
+    Route::get('attendances/filter', [AttendanceController::class, 'filterByDate']);
+    Route::post('attendances/ExcelImport', [AttendanceController::class, 'ExcelImport']);
+
+
+
+    // salaries
+    Route::get('salarys', [SalariesController::class, 'index']);
+    Route::get('salary/search', [SalariesController::class, 'search']);
+    Route::get('salary/search-by-month-year', [SalariesController::class, 'searchByMonthAndYear']);
+    Route::get('salary/{id}', [SalariesController::class, 'show']);
+    Route::patch('salary/{id}', [SalariesController::class, 'update']);
+    Route::apiResource('salary', SalariesController::class);
+
+
+
+    Route::apiResource('users', UserController::class);  
+    Route::apiResource('groups', GroupController::class);
+
+    Route::apiResource('holidays', HolidaysController::class);
+    Route::apiResource('weekends', WeekendController::class);
+
 
     //Logout
     Route::post('logout', [LoginController::class, 'logout']);
-
-    //Add all the routes Heeeerrrrrreeeeeeeeee pleeeeaaaasssssee
-
-    // attendance
-
 });
-
-
