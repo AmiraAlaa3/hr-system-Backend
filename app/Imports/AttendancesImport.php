@@ -21,10 +21,10 @@ class AttendancesImport implements ToCollection,WithHeadingRow
 {
     foreach ($rows as $row) 
     {
+        // dd($row);
         $attendance = Attendnce::where('employee_id', $row['employee_id'])
                                 ->where('date', $this->convertDate($row['date']))
                                 ->first();
-
         if($attendance){
             $attendance->update([
                 'employee_id' => $row['employee_id'],
