@@ -37,7 +37,8 @@ class LoginController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Login successful',
-            'token' => $user->createToken('API TOKEN')->plainTextToken
+            'token' => $user->createToken('API TOKEN')->plainTextToken,
+            'name' => $user -> name
         ], 200);
     }
 
