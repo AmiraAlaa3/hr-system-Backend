@@ -19,6 +19,7 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
+            'password'=> $this->password,
             'groups' => $this->groups->map(function ($group) {
                 $permissions = [];
 
