@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\SalariesController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\Controller;
 use App\Http\Controllers\Api\LoginController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,9 @@ use Illuminate\Support\Facades\Route;
 //Login
 Route::post('login', [LoginController::class, 'login']);
 Route::middleware(['auth:sanctum'])->group(function () {
+    //Dashboard
+    Route::get('dashboard', [DashboardController::class, 'countDashboard']);
+
     // employees
 
     Route::get('employees/search', [EmployeeController::class, 'search']);
@@ -40,12 +44,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // departments
     Route::get('departments/search', [DepartmentController::class, 'search']);
     Route::apiResource('departments', DepartmentController::class);
-
+  
     // attendances
     Route::apiResource('attendances', AttendanceController::class);
     Route::get('attendances/search', [AttendanceController::class, 'search']);
     Route::get('attendances/filter', [AttendanceController::class, 'filterByDate']);
     Route::post('attendances/ExcelImport', [AttendanceController::class, 'ExcelImport']);
+
 
 
     // salaries
