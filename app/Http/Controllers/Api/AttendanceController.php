@@ -17,7 +17,6 @@ use App\Models\Attendnce;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-
 class AttendanceController extends Controller
 {
     /**

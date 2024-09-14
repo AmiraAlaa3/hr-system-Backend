@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\SalariesController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\Controller;
 use App\Http\Controllers\Api\LoginController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -60,6 +61,10 @@ Route::apiResource('departments',DepartmentController::class);
 
 Route::apiResource('holidays', HolidaysController::class);
 Route::apiResource('weekends',WeekendController::class);
+
+// user
+
+Route::apiResource('users', UserController::class);
 
 //Login
 Route::post('login', [LoginController::class, 'login']);
