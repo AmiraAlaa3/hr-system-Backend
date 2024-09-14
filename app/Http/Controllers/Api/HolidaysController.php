@@ -4,15 +4,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
-use App\Models\EmployeeAttendanceAdjustment;
 use App\Http\Resources\HolidaysResource;
 use App\Models\Annual_Holidays;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Casual_Holidays;
-use App\Models\User;
-use App\Models\Department;
-use App\Models\Employee;
-use App\Models\Weekend;
+
 
 class HolidaysController extends Controller
 {
@@ -63,7 +58,7 @@ class HolidaysController extends Controller
     /**
      * Update the specified resource in storage.
      */
-      
+
 
     public function update(Request $request, string $id)
     {
@@ -74,7 +69,7 @@ class HolidaysController extends Controller
             'description' => 'required|string|max:255',
             'from_date' => 'required|date',
             'to_date' => 'required|date',
-            'numberOfDays' => 'required|number',
+            'numberOfDays' => 'required|integer',
           ]);
 
           if($validateDate->fails()){
@@ -95,9 +90,9 @@ class HolidaysController extends Controller
         if (!$holiday) {
             return response()->json(['message' => 'holiday not found'], 404);
         }
-    
+
         $holiday->delete();
-    
+
         return response()->json(['message' => 'holiday deleted successfully']);
     }
 }

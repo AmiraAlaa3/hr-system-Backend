@@ -21,7 +21,7 @@ class UserController extends Controller
 
         return UserResource::collection($users);
 
-        
+
     }
 
     /**
@@ -33,24 +33,24 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'group_ids' => 'required|array',  
-            'group_ids.*' => 'exists:groups,id', 
+            'group_ids' => 'required|array',
+            'group_ids.*' => 'exists:groups,id',
         ]);
 
         // Create the user
-        
+
             $user = User::create([
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
                 'password' => Hash::make($validatedData['password']),
             ]);
-        
+
             $user->groups()->sync($validatedData['group_ids']);
-        
+
             return new UserResource($user);
 
 
-    
+
     }
 
     /**
@@ -74,8 +74,8 @@ class UserController extends Controller
     {
     $validatedData = $request->validate([
         'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users,email,' . $id,  
-        'password' => 'nullable|string|min:8',  
+        'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+        'password' => 'nullable|string|min:8',
         'group_ids' => 'required|array',
         'group_ids.*' => 'exists:groups,id',
     ]);
