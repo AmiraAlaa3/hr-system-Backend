@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Controller;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\GroupController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -63,11 +64,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
 
+    Route::apiResource('users', UserController::class);  
+    Route::apiResource('groups', GroupController::class);
+
     Route::apiResource('holidays', HolidaysController::class);
     Route::apiResource('weekends', WeekendController::class);
 
-    // user
-    Route::apiResource('users', UserController::class);
 
     //Logout
     Route::post('logout', [LoginController::class, 'logout']);
