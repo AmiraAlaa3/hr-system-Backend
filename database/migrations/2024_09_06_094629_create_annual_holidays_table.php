@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('casual__holidays', function (Blueprint $table) {
+        Schema::create('annual_holidays', function (Blueprint $table) {
             $table->id();
             $table->date('date');
-            $table->string('reason');
-            $table->enum('status',['approved','Unapproved','New']);
+            $table->string('title');
+            $table->string('description');
             $table->date('from_date');
             $table->date('to_date');
             $table->integer('numberOfDays');
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('casual__holidays');
+        Schema::dropIfExists('annual_holidays');
     }
 };
