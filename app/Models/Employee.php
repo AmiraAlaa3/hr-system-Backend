@@ -93,7 +93,7 @@ class Employee extends Model
             'tuesday'   => Carbon::TUESDAY,
             'Wednesday' => Carbon::WEDNESDAY,
             'Thursday'  => Carbon::THURSDAY,
-            'Friday'    => Carbon::FRIDAY,
+            'friday'    => Carbon::FRIDAY,
             'saturday'  => Carbon::SATURDAY,
         ];
     
