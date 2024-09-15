@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\GroupController;
+use App\Http\Controllers\UserController as ControllersUserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -45,7 +46,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // departments
     Route::get('departments/search', [DepartmentController::class, 'search']);
     Route::apiResource('departments', DepartmentController::class);
-  
+
     // attendances
     Route::apiResource('attendances', AttendanceController::class);
     Route::get('attendances/search', [AttendanceController::class, 'search']);
@@ -63,8 +64,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('salary', SalariesController::class);
 
 
-
-    Route::apiResource('users', UserController::class);  
+    Route::apiResource('users',UserController::class);
     Route::apiResource('groups', GroupController::class);
 
     Route::apiResource('holidays', HolidaysController::class);
