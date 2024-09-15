@@ -33,6 +33,7 @@ class UserController extends Controller
     // Validate a single group_id
     $validatedData = $request->validate([
         'name' => 'required|string|max:255',
+        'Full_name' => 'required|string|max:255',
         'email' => 'required|string|email|max:255|unique:users',
         'password' => 'required|string|min:8',
         'group_id' => 'required|exists:groups,id',  // Validate a single group_id
@@ -41,6 +42,7 @@ class UserController extends Controller
     // Create the user
     $user = User::create([
         'name' => $validatedData['name'],
+        'Full_name' => $validatedData['Full_name'], 
         'email' => $validatedData['email'],
         'password' => Hash::make($validatedData['password']),
     ]);
@@ -73,9 +75,10 @@ class UserController extends Controller
         // Validate a single group_id
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $id,  // Ensure unique email, except for current user
-            'password' => 'nullable|string|min:8',  // Password is optional for updates
-            'group_id' => 'required|exists:groups,id',  // Validate a single group_id
+            'Full_name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            'password' => 'nullable|string|min:8',
+            'group_id' => 'required|exists:groups,id',
         ]);
 
         $user = User::findOrFail($id);
@@ -84,6 +87,7 @@ class UserController extends Controller
         $user->update([
             'name' => $validatedData['name'],
             'email' => $validatedData['email'],
+            'Full_name' => $validatedData['Full_name'],
             'password' => $request->filled('password') ? Hash::make($validatedData['password']) : $user->password,
         ]);
 
