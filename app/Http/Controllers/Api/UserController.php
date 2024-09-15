@@ -21,13 +21,14 @@ class UserController extends Controller
 
         return UserResource::collection($users);
 
-        
+
     }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
+
 {
     // Validate a single group_id
     $validatedData = $request->validate([
@@ -43,6 +44,7 @@ class UserController extends Controller
         'email' => $validatedData['email'],
         'password' => Hash::make($validatedData['password']),
     ]);
+
 
     // Attach the single group
     $user->groups()->sync([$validatedData['group_id']]);  // Sync single group as an array
