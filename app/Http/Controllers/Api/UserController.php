@@ -77,19 +77,19 @@ class UserController extends Controller
             'password' => 'nullable|string|min:8',  // Password is optional for updates
             'group_id' => 'required|exists:groups,id',  // Validate a single group_id
         ]);
-    
+
         $user = User::findOrFail($id);
-    
+
         // Update the user details
         $user->update([
             'name' => $validatedData['name'],
             'email' => $validatedData['email'],
             'password' => $request->filled('password') ? Hash::make($validatedData['password']) : $user->password,
         ]);
-    
+
         // Attach the single group
         $user->groups()->sync([$validatedData['group_id']]);  // Sync single group as an array
-    
+
         return new UserResource($user);
     }
     /**

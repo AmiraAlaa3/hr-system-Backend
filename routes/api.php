@@ -10,9 +10,10 @@ use App\Http\Controllers\Api\Controller;
 use App\Http\Controllers\Api\genral_settingController;
 use App\Http\Controllers\Api\LoginController;
 use App\Models\GenralSetting;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\GroupController;
+use App\Http\Controllers\UserController as ControllersUserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -39,7 +40,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('login', [LoginController::class, 'login']);
 Route::middleware(['auth:sanctum'])->group(function () {
     //Dashboard
-    Route::get('dashboard', [DashboardController::class, 'countDashboard']);
+    Route::get('dashboard', [DashboardController::class, 'index']);
 
     // employees
 
@@ -49,7 +50,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // departments
     Route::get('departments/search', [DepartmentController::class, 'search']);
     Route::apiResource('departments', DepartmentController::class);
-  
+
     // attendances
     Route::apiResource('attendances', AttendanceController::class);
     Route::get('attendances/search', [AttendanceController::class, 'search']);
@@ -70,9 +71,8 @@ Route::put('weekend/{id}', [genral_settingController::class, 'update']);
 
 
 
-
-Route::apiResource('holidays', HolidaysController::class);
-    Route::apiResource('users', UserController::class);  
+    Route::apiResource('holidays', HolidaysController::class);
+    Route::apiResource('users', UserController::class);
     Route::apiResource('groups', GroupController::class);
     Route::post('logout', [LoginController::class, 'logout']);
 
