@@ -4,11 +4,12 @@ use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 
 use App\Http\Controllers\Api\HolidaysController;
-use App\Http\Controllers\Api\WeekendController;
 use App\Http\Controllers\Api\SalariesController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\Controller;
+use App\Http\Controllers\Api\genral_settingController;
 use App\Http\Controllers\Api\LoginController;
+use App\Models\GenralSetting;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\GroupController;
@@ -29,6 +30,9 @@ use Illuminate\Support\Facades\Route;
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
+
+
+
 
 
 //Login
@@ -54,23 +58,23 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
 
-    // salaries
-    Route::get('salarys', [SalariesController::class, 'index']);
-    Route::get('salary/search', [SalariesController::class, 'search']);
-    Route::get('salary/search-by-month-year', [SalariesController::class, 'searchByMonthAndYear']);
-    Route::get('salary/{id}', [SalariesController::class, 'show']);
-    Route::patch('salary/{id}', [SalariesController::class, 'update']);
-    Route::apiResource('salary', SalariesController::class);
+// salaries
+Route::get('salarys', [SalariesController::class, 'index']);
+Route::get('salary/search', [SalariesController::class, 'search']);
+Route::get('salary/search-by-month-year', [SalariesController::class, 'calculateBonusDeduction']);
+Route::get('salary/{id}', [SalariesController::class, 'show']);
+// Route::patch('salary/{id}', [SalariesController::class, 'update']);
+Route::get('check/{id}', [SalariesController::class, 'calculateBonusDeduction']);
+// Route::get('bonus/{id}', [SalariesController::class, 'calculateBonusDeduction']);
+Route::put('weekend/{id}', [genral_settingController::class, 'update']);
 
 
 
+
+Route::apiResource('holidays', HolidaysController::class);
     Route::apiResource('users', UserController::class);  
     Route::apiResource('groups', GroupController::class);
-
-    Route::apiResource('holidays', HolidaysController::class);
-    Route::apiResource('weekends', WeekendController::class);
-
-
-    //Logout
     Route::post('logout', [LoginController::class, 'logout']);
+
+
 });
