@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Employee;
+use App\Models\Attendnce;
+
 use App\Models\Adjustment;
 use App\Http\Resources\SalariesResource;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 class SalariesController extends Controller
 
 {
@@ -18,8 +21,6 @@ class SalariesController extends Controller
     public function index()
     {
         $employee = Employee::all();
-
-    
         return SalariesResource::collection($employee);
     }
 
@@ -47,7 +48,7 @@ class SalariesController extends Controller
     {
 
         
-        $employee = Employee::with(['attendanceAdjustments.attendance','attendanceAdjustments.adjustment'])
+        $employee = Employee::with(['attendances'])
         ->findOrFail($id);
      
         return new SalariesResource($employee);
@@ -135,105 +136,32 @@ class SalariesController extends Controller
         return SalariesResource::collection($employee);
     }
 
-    public function searchByMonthAndYear(Request $request)
+
+    public function calculateBonusDeduction( Request $request)
     {
-        // Validate the request
         $validator = Validator::make($request->all(), [
-            'month' => 'integer|between:1,12', 
-            'year' => 'integer|min:2008',      
-        ]);
-    
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
-        }
-    
-        $month = $request->input('month');
-        $year = $request->input('year');
-    
-        if (!$month && !$year) {
-            return response()->json(['message' => 'Please provide at least a month or a year'], 400);
-        }
-    else if($year){
-        
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
-        }
-    
-        $year = $request->input('year');
-    
-        $employeesData = collect();
-    
-        for ($month = 1; $month <= 12; $month++) {
-    
-            $employees = Employee::whereHas('attendanceAdjustments', function ($query) use ($month, $year) {
-                $query->whereHas('attendance', function ($q) use ($month, $year) {
-                    $q->whereMonth('date', $month)
-                    ->whereYear('date', $year);
-                });
-            })->get();
-    
-            $employees->each(function ($employee) use ($month, $year, &$employeesData) {
-                $workDays = $employee->getWorkDaysAttribute($month, $year);
-                $bonusHours = $employee->totalBonusHours($month, $year);
-                $absenceDays = $employee->getAbsenceDaysAttribute($month, $year);
-                $deductionHours = $employee->totalDeductionsHours($month, $year);
-                $totalBonusAmount = $employee->totalBounsAmount($month, $year);
-                $totalDeductionAmount = $employee->totalDeductionAmount($month, $year);
-                $totalSalaryAmount = $employee->totalSalaryAmount($month, $year);
-    
-                $employeesData->push([
-                    'name' => $employee->name,
-                    'month' => $month,
-                    'year' => $year,
-                    'work_days' => $workDays,
-                    'bonus_hours' => $bonusHours,
-                    'absence_days' => $absenceDays,
-                    'deduction_hours' => $deductionHours,
-                    'total_bonus_amount' => $totalBonusAmount,
-                    'total_deduction_amount' => $totalDeductionAmount,
-                    'total_salary_amount' => $totalSalaryAmount,
+                    'month' => 'integer|between:1,12', 
+                    'year' => 'integer|min:2008',      
                 ]);
-            });
-        }
-    
-        if ($employeesData->isEmpty()) {
-            return response()->json(['message' => 'No salaries found for the specified year'], 404);
-        }
-    
-        return response()->json($employeesData);
-    
-       
-    }
-        $employees = Employee::whereHas('attendanceAdjustments', function ($query) use ($month, $year) {
-            $query->whereHas('attendance', function ($q) use ($month, $year) {
-                if ($month) {
-                    $q->whereMonth('date', $month);
-                }
-                if ($year) {
-                    $q->whereYear('date', $year);
-                }
-            });
-        })->get();
-    
-        if ($employees->isEmpty()) {
-            return response()->json(['message' => 'No employees found for the specified month and/or year'], 404);
-        }
-    
-        $employees->each(function ($employee) use ($month, $year) {
-            $employee->getWorkDaysAttribute($month, $year);
-            $employee->totalBonusHours($month, $year);
-            $employee->getAbsenceDaysAttribute($month, $year);
-            $employee->totalDeductionsHours($month, $year);
-            $employee->totalBounsAmount($month, $year);
-            $employee->totalDeductionAmount($month, $year);
-            $employee->totalSalaryAmount($month, $year);
-        });
-    
-        return SalariesResource::collection($employees);
-    }
-    
+                  $month = $request->input('month');
+        $year = $request->input('year');  
+        $employees = Employee::whereHas('attendances', function ($q) use ($month, $year) {
+                            $q->whereMonth('date', $month)
+                            ->whereYear('date', $year);
+                        
+                    })->get();
+        //  $employee = Employee::findOrFail($employeeId);
 
+         $employees->each(function ($employee) use ($month, $year) {
+                    $employee->getWorkDaysAttribute($month, $year);
+                    $employee->getAbsenceDaysAttribute($month, $year);
+                    $employee->totalSalaryAmount($month, $year);
+                    $employee->calculateMonthlyBonusDeduction($month, $year); 
+                });
+ 
+         return SalariesResource::collection($employees);
 
+}
 
 
 }

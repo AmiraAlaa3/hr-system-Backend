@@ -8,6 +8,7 @@ use App\Http\Resources\SalariesResource;
 use App\Models\Employee;
 use Carbon\Carbon;
 use App\Models\EmployeeAttendanceAdjustment;
+use App\Models\GenralSetting;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -17,7 +18,7 @@ class EmployeeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+        public function index()
     {
         $employee = Employee::all();
         return EmployeeResource::collection($employee);
@@ -70,6 +71,11 @@ class EmployeeController extends Controller
         }
         $validatedData = $validatedData->validated();
         $employee = Employee::create($validatedData);
+        $defaultSetting = GenralSetting::first();
+        // dd($defaultSetting);
+        if ($defaultSetting) {
+            $employee->settings()->attach($defaultSetting->id);
+        }
         return new EmployeeResource($employee);
     }
 
