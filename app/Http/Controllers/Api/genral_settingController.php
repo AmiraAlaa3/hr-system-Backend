@@ -55,6 +55,9 @@ class genral_settingController extends Controller
         $validated = $request->validate([
             'weekend1' => 'required|string|in:Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
             'weekend2' => 'required|string|in:Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
+            'bonusHours'=>'required|number|max:5',
+            'deductionsHours'=>'required|number|max:5',
+            
         ]);
 
         // Check if the same day is selected for both weekends
@@ -78,6 +81,9 @@ class genral_settingController extends Controller
 
         $generalSetting->weekend1 = $validated['weekend1'];
         $generalSetting->weekend2 = $validated['weekend2'];
+        $generalSetting->bonusHours=$validated['bonusHours'];
+        $generalSetting->deductionsHours=$validated['deductionsHours'];
+        
         $generalSetting->save(); 
         return response()->json([
             'message' => 'Weekend days updated successfully.',
