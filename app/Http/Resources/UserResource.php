@@ -19,31 +19,31 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
-            'password'=> $this->password,
-            'groups' => $this->groups->map(function ($group) {
+            'password' => $this->password,
+            // Return the group data with both group ID and name
+            'group' => [
+                'id' => $this->groups->first()->id, // Assuming the user has only one group
+                'name' => $this->groups->first()->name,
+            ],
+            'permissions' => $this->groups->first()->permissions->map(function ($permission) {
                 $permissions = [];
-
-                // Iterate over each permission in the group
-                foreach ($group->permissions as $permission) {
-                    if ($permission->add === 'true') {
-                        $permissions[] = 'add';
-                    }
-                    if ($permission->edit === 'true') {
-                        $permissions[] = 'edit';
-                    }
-                    if ($permission->view === 'true') {
-                        $permissions[] = 'view';
-                    }
-                    if ($permission->delete === 'true') {
-                        $permissions[] = 'delete';
-                    }
+        
+                if ($permission->add === 'true') {
+                    $permissions[] = 'add';
                 }
 
-                return [
-                    'id' => $group->id,
-                    'name' => $group->name,
-                    'permissions' => $permissions,
-                ];
+                if ($permission->edit === 'true') {
+                    $permissions[] = 'edit';
+                }
+                if ($permission->view === 'true') {
+                    $permissions[] = 'view';
+                }
+                if ($permission->delete === 'true') {
+                    $permissions[] = 'delete';
+                }
+        
+                return $permissions;
+
             }),
         ];
     }

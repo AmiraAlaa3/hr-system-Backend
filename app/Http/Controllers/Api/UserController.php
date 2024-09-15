@@ -28,31 +28,29 @@ class UserController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'group_ids' => 'required|array',
-            'group_ids.*' => 'exists:groups,id',
-        ]);
 
-        // Create the user
+{
+    // Validate a single group_id
+    $validatedData = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:8',
+        'group_id' => 'required|exists:groups,id',  // Validate a single group_id
+    ]);
 
-            $user = User::create([
-                'name' => $validatedData['name'],
-                'email' => $validatedData['email'],
-                'password' => Hash::make($validatedData['password']),
-            ]);
-
-            $user->groups()->sync($validatedData['group_ids']);
-
-            return new UserResource($user);
+    // Create the user
+    $user = User::create([
+        'name' => $validatedData['name'],
+        'email' => $validatedData['email'],
+        'password' => Hash::make($validatedData['password']),
+    ]);
 
 
+    // Attach the single group
+    $user->groups()->sync([$validatedData['group_id']]);  // Sync single group as an array
 
-    }
-
+    return new UserResource($user);
+}
     /**
      * Display the specified resource.
      */
@@ -72,27 +70,28 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-    $validatedData = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users,email,' . $id,
-        'password' => 'nullable|string|min:8',
-        'group_ids' => 'required|array',
-        'group_ids.*' => 'exists:groups,id',
-    ]);
-
-    $user = User::findOrFail($id);
-
-    $user->update([
-        'name' => $validatedData['name'],
-        'email' => $validatedData['email'],
-        'password' => $request->filled('password') ? Hash::make($validatedData['password']) : $user->password,
-    ]);
-
-    $user->groups()->sync($validatedData['group_ids']);
-
-    return new UserResource($user);
+        // Validate a single group_id
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $id,  // Ensure unique email, except for current user
+            'password' => 'nullable|string|min:8',  // Password is optional for updates
+            'group_id' => 'required|exists:groups,id',  // Validate a single group_id
+        ]);
+    
+        $user = User::findOrFail($id);
+    
+        // Update the user details
+        $user->update([
+            'name' => $validatedData['name'],
+            'email' => $validatedData['email'],
+            'password' => $request->filled('password') ? Hash::make($validatedData['password']) : $user->password,
+        ]);
+    
+        // Attach the single group
+        $user->groups()->sync([$validatedData['group_id']]);  // Sync single group as an array
+    
+        return new UserResource($user);
     }
-
     /**
      * Remove the specified resource from storage.
      */
