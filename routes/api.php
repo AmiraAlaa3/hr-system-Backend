@@ -64,13 +64,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
 
-    Route::apiResource('users', UserController::class);  
-    Route::apiResource('groups', GroupController::class);
-
+    
     Route::apiResource('holidays', HolidaysController::class);
     Route::apiResource('weekends', WeekendController::class);
-
-
+    
+    
     //Logout
     Route::post('logout', [LoginController::class, 'logout']);
 });
+Route::apiResource('users', UserController::class);  
+Route::apiResource('groups', GroupController::class);
