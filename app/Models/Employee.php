@@ -1,16 +1,16 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Carbon\CarbonPeriod;
 use Carbon\Carbon;
-use function Laravel\Prompts\table;
+use App\Models\GenralSetting;
+use Carbon\CarbonPeriod;
 
 class Employee extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'name',
         'email',
@@ -29,38 +29,35 @@ class Employee extends Model
         'department_id'
     ];
 
+    // Define relationships
     public function department()
     {
         return $this->belongsTo(Department::class);
     }
+
     public function annual_holidays()
     {
         return $this->belongsToMany(Annual_Holidays::class,'employee_annual_holiyday');
     }
-        public function users()
-        {
-            return $this->belongsToMany(User::class,'hrs_empolyees');
-        }
-    public function weekend()
+
+    public function users()
     {
-        return $this->belongsToMany(Weekend::class,'employee_weekend');
+        return $this->belongsToMany(User::class,'hrs_empolyees');
     }
-
-    public function attendanceAdjustments()
+    public function settings()
     {
-      
-        return $this->hasMany(EmployeeAttendanceAdjustment::class);
-
+        return $this->belongsToMany(GenralSetting::class,'employee_genral_setting');
     }
     public function attendances()
     {
         return $this->hasMany(Attendnce::class);
     }
+
     public function bonuses()
     {
         return $this->attendanceAdjustments()->whereHas('adjustment', function($query) {
-                        $query->where('type', 'bouns');
-                    });
+            $query->where('type', 'bouns');
+        });
     }
 
     public function deductions()
@@ -70,13 +67,16 @@ class Employee extends Model
         });
     }
 
-
     public function getWorkDaysAttribute($month = null, $year = null)
     {
         $month = $month ?: now()->month;
-    $year = $year ?: now()->year;
+        $year = $year ?: now()->year;
 
-    return $this->attendances()->whereMonth('date', $month)->whereYear('date', $year)->distinct('date')->count('date');
+        return $this->attendances()
+            ->whereMonth('date', $month)
+            ->whereYear('date', $year)
+            ->distinct('date')
+            ->count('date');
     }
 
     public function getAbsenceDaysAttribute($month = null, $year = null)
@@ -84,81 +84,122 @@ class Employee extends Model
         $month = $month ?: Carbon::now()->month;
         $year = $year ?: Carbon::now()->year;
     
+        $setting = GenralSetting::first(); 
+        $weekend1 = $setting->weekend1; 
+        $weekend2 = $setting->weekend2;
+        $dayMapping = [
+            'Sunday'    => Carbon::SUNDAY,
+            'Monday'    => Carbon::MONDAY,
+            'tuesday'   => Carbon::TUESDAY,
+            'Wednesday' => Carbon::WEDNESDAY,
+            'Thursday'  => Carbon::THURSDAY,
+            'Friday'    => Carbon::FRIDAY,
+            'saturday'  => Carbon::SATURDAY,
+        ];
+    
+        $weekend1 = $dayMapping[$weekend1]; 
+        $weekend2 = $dayMapping[$weekend2]; 
+        
         $startOfMonth = Carbon::create($year, $month, 1)->startOfMonth();
         $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth();
         $period = CarbonPeriod::create($startOfMonth, $endOfMonth);
+    
         $totalWorkDays = 0;
-
+    
+        // Loop through each day in the period and calculate total workdays
         foreach ($period as $date) {
-
-            if ($date->dayOfWeek >= Carbon::SUNDAY && $date->dayOfWeek <= Carbon::THURSDAY) {
+            if ($date->dayOfWeek != $weekend1 && $date->dayOfWeek != $weekend2) {
                 $totalWorkDays++;
             }
         }
-        
-        $presentDays = $this->attendances()->whereMonth('date', $month)->whereYear('date', $year)->distinct('date')->count('date');
-
-        return $totalWorkDays - $presentDays;
-        }
     
+        $presentDays = $this->attendances()
+            ->whereMonth('date', $month)
+            ->whereYear('date', $year)
+            ->distinct('date')
+            ->count('date');
+    
+        return $totalWorkDays - $presentDays;
+    }
+    
+
     public function salaryPerMinute()
     {
         $workdaysPerMonth = 22;
         $workingHoursPerDay = 8;
         $totalMinutesPerMonth = $workdaysPerMonth * $workingHoursPerDay * 60;
+
         return $this->salary / $totalMinutesPerMonth;
     }
-  
-    public function totalBounsAmount($month = null, $year = null)
-{
-    $month = $month ?: now()->month;
-        $year = $year ?: now()->year;
-        $totalBonusHours = $this->totalBonusHours($month, $year);
-    $bonusMinutes = $totalBonusHours * 60;
-    return $bonusMinutes * $this->salaryPerMinute();
-}
-public function totalBonusHours($month = null, $year = null)
-{
-    $month = $month ?: now()->month;
-     $year= $year ?: now()->year;
-        return $this->attendanceAdjustments()->join('adjustments', 'employee_attendance_adjustments.adjustment_id', '=', 'adjustments.id')
-                    ->where('adjustments.type', 'bouns')->whereMonth('date', $month)
-                    ->whereYear('date', $year)->sum('adjustments.houres');
-}
 
-public function totalDeductionsHours($month = null, $year = null)
-{
-    $month = $month ?: now()->month;
-    $year = $year ?: now()->year;
-    return $this->attendanceAdjustments()->join('adjustments', 'employee_attendance_adjustments.adjustment_id', '=', 'adjustments.id')
-                ->where('adjustments.type', 'dedeuction')->whereMonth('date', $month)
-                ->whereYear('date', $year)->sum('adjustments.houres');
-}
-  public function totalDeductionAmount($month = null, $year = null)
-{
-    $month = $month ?: now()->month;
-    $year = $year ?: now()->year;
+    public function calculateMonthlyBonusDeduction($month = null, $year = null)
+    {
+        $month = $month ?: Carbon::now()->month;
+        $year = $year ?: Carbon::now()->year;
     
-    $totalDeductionHours = $this->totalDeductionsHours($month, $year);
+        $attendances = $this->attendances()
+            ->whereMonth('date', $month)
+            ->whereYear('date', $year)
+            ->get();
     
-    $deductionMinutes = $totalDeductionHours * 60;
+        $totalBonus = 0;
+        $totalDeduction = 0;
     
-    return $deductionMinutes * $this->salaryPerMinute();
-}
-
+        $workStartTime = Carbon::createFromTimeString($this->check_in_time);
+        $workEndTime = Carbon::createFromTimeString($this->check_out_time);
+    
+        $setting = $this->settings()->first(); 
+    
+        $bonusHours = $setting ? $setting->bonusHours : 1;  
+        $deductionHours = $setting ? $setting->deductionsHours : 1; 
+    
+        $bonusMinutes = 0;
+        $earlyLeaveMinutes = 0;
+        $deductionMinutes = 0;
+    
+        foreach ($attendances as $attendance) {
+            $checkInTime = $attendance->checkIN ? Carbon::parse($attendance->checkIN) : null;
+            $checkOutTime = $attendance->checkOUT ? Carbon::parse($attendance->checkOUT) : null;
+    
+            if ($checkInTime && $checkOutTime) {
+                if ($checkInTime->greaterThan($workStartTime)) {
+                    $deductionMinutes += $checkInTime->diffInMinutes($workStartTime);
+                    $totalDeduction += $deductionMinutes * $this->salaryPerMinute();
+                }
+    
+                if ($checkOutTime->greaterThan($workEndTime)) {
+                    $bonusMinutes += $checkOutTime->diffInMinutes($workEndTime);
+                    $totalBonus += $bonusMinutes * $this->salaryPerMinute();
+                }
+                elseif ($checkOutTime->lessThan($workEndTime)) {
+                    $earlyLeaveMinutes += $workEndTime->diffInMinutes($checkOutTime);
+                    $totalDeduction += $earlyLeaveMinutes * $this->salaryPerMinute();
+                }
+            }
+        }
+    
+        $totalBonus *= $bonusHours;
+        $totalDeduction *= $deductionHours;
+    
+        return [
+            'total_bonus' => $totalBonus,
+            'total_deduction' => $totalDeduction,
+            'bonus_hours' => $bonusMinutes / 60,
+            'deduction_hours' => ($earlyLeaveMinutes + $deductionMinutes) / 60,
+        ];
+    }
+    
 public function totalSalaryAmount($month = null, $year = null)
 {
     $month = $month ?: now()->month;
     $year = $year ?: now()->year;
-
     $workDays = $this->getWorkDaysAttribute($month, $year);
-    $bonusAmount = $this->totalBounsAmount($month, $year);
-    $deductionAmount = $this->totalDeductionAmount($month, $year);
-
+    $bonusDeductionData = $this->calculateMonthlyBonusDeduction($month, $year);
+    $bonusAmount = $bonusDeductionData['total_bonus'];
+    $deductionAmount = $bonusDeductionData['total_deduction'];
     $salaryPerMinute = $this->salaryPerMinute();
     $totalWorkingMinutes = $workDays * 8 * 60; 
     $baseSalary = $totalWorkingMinutes * $salaryPerMinute;
-
     return $baseSalary + $bonusAmount - $deductionAmount;
 }
 

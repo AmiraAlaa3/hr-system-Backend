@@ -7,8 +7,9 @@ use App\Http\Controllers\Api\SalariesController;
 
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\Controller;
+use App\Http\Controllers\Api\genral_settingController;
 use App\Http\Controllers\Api\LoginController;
-
+use App\Models\GenralSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,27 +32,27 @@ use Illuminate\Support\Facades\Route;
 
 
 
-//Login
-Route::post('login', [LoginController::class, 'login']);
-Route::middleware(['auth:sanctum'])->group(function () {
-    // employees
-    Route::get('employees/search', [EmployeeController::class, 'search']);
-    Route::apiResource('employees', EmployeeController::class);
+// //Login
+// Route::post('login', [LoginController::class, 'login']);
+// Route::middleware(['auth:sanctum'])->group(function () {
+//     // employees
+//     Route::get('employees/search', [EmployeeController::class, 'search']);
+//     Route::apiResource('employees', EmployeeController::class);
 
-    // departments
-    Route::get('departments/search', [DepartmentController::class, 'search']);
-    Route::apiResource('departments', DepartmentController::class);
+//     // departments
+//     Route::get('departments/search', [DepartmentController::class, 'search']);
+//     Route::apiResource('departments', DepartmentController::class);
 
-    //Logout
-    Route::post('logout', [LoginController::class, 'logout']);
+//     //Logout
+//     Route::post('logout', [LoginController::class, 'logout']);
 
-    //Add all the routes Heeeerrrrrreeeeeeeeee pleeeeaaaasssssee
+//     //Add all the routes Heeeerrrrrreeeeeeeeee pleeeeaaaasssssee
 
-    // attendance
-    Route::get('attendances/search', [AttendanceController::class, 'search']);
-    Route::get('attendances/filter', [AttendanceController::class, 'filterByDate']);
-    Route::apiResource('attendances', AttendanceController::class);
-});
+//     // attendance
+//     Route::get('attendances/search', [AttendanceController::class, 'search']);
+//     Route::get('attendances/filter', [AttendanceController::class, 'filterByDate']);
+//     Route::apiResource('attendances', AttendanceController::class);
+// });
 
 
 
@@ -68,9 +69,13 @@ Route::apiResource('employees', EmployeeController::class);
 // salaries
 Route::get('salarys', [SalariesController::class, 'index']);
 Route::get('salary/search', [SalariesController::class, 'search']);
-Route::get('salary/search-by-month-year', [SalariesController::class, 'searchByMonthAndYear']);
+Route::get('salary/search-by-month-year', [SalariesController::class, 'calculateBonusDeduction']);
 Route::get('salary/{id}', [SalariesController::class, 'show']);
-Route::patch('salary/{id}', [SalariesController::class, 'update']);
+// Route::patch('salary/{id}', [SalariesController::class, 'update']);
+Route::get('check/{id}', [SalariesController::class, 'calculateBonusDeduction']);
+// Route::get('bonus/{id}', [SalariesController::class, 'calculateBonusDeduction']);
+Route::put('weekend/{id}', [genral_settingController::class, 'update']);
+
 
 Route::apiResource('salary', SalariesController::class);
 
@@ -81,7 +86,7 @@ Route::apiResource('departments',DepartmentController::class);
 
 //Login
 Route::post('login', [LoginController::class, 'login']);
-Route::middleware(['auth:sanctum'])->group(function () {
+// Route::middleware(['auth:sanctum'])->group(function () {
 
     // departments
     Route::get('departments/search', [DepartmentController::class, 'search']);
@@ -94,5 +99,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // attendance
 
-});
-
+// }    );
