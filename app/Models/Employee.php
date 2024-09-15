@@ -71,13 +71,35 @@ class Employee extends Model
     {
         $month = $month ?: now()->month;
         $year = $year ?: now()->year;
-
+    
+        $setting = GenralSetting::first();
+        $weekend1 = $setting->weekend1; 
+        $weekend2 = $setting->weekend2;
+        
+        $dayMapping = [
+            'Sunday'    => Carbon::SUNDAY,
+            'monday'    => Carbon::MONDAY,
+            'tuesday'   => Carbon::TUESDAY,
+            'wednesday' => Carbon::WEDNESDAY,
+            'thursday'  => Carbon::THURSDAY,
+            'friday'    => Carbon::FRIDAY,
+            'saturday'  => Carbon::SATURDAY,
+        ];
+    
+        $weekend1 = $dayMapping[$weekend1];
+        $weekend2 = $dayMapping[$weekend2];
+    
         return $this->attendances()
             ->whereMonth('date', $month)
             ->whereYear('date', $year)
+            ->where(function($query) use ($weekend1, $weekend2) {
+                $query->whereRaw('DAYOFWEEK(date) != ?', [$weekend1])
+                      ->whereRaw('DAYOFWEEK(date) != ?', [$weekend2]);
+            })
             ->distinct('date')
             ->count('date');
     }
+    
 
     public function getAbsenceDaysAttribute($month = null, $year = null)
     {
@@ -96,20 +118,36 @@ class Employee extends Model
             'Friday'    => Carbon::FRIDAY,
             'Saturday'  => Carbon::SATURDAY,
         ];
-
-        $weekend1 = $dayMapping[$weekend1];
+    
+        $weekend1 = $dayMapping[$weekend1]; 
         $weekend2 = $dayMapping[$weekend2];
-
+    
         $startOfMonth = Carbon::create($year, $month, 1)->startOfMonth();
         $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth();
         $period = CarbonPeriod::create($startOfMonth, $endOfMonth);
 
         $totalWorkDays = 0;
 
+    
+        $holidays = Annual_Holidays::where(function ($query) use ($startOfMonth, $endOfMonth) {
+            $query->whereBetween('from_date', [$startOfMonth, $endOfMonth])
+                  ->orWhereBetween('to_date', [$startOfMonth, $endOfMonth]);
+        })->get();
+    
         // Loop through each day in the period and calculate total workdays
         foreach ($period as $date) {
             if ($date->dayOfWeek != $weekend1 && $date->dayOfWeek != $weekend2) {
-                $totalWorkDays++;
+                $isHoliday = false;
+                foreach ($holidays as $holiday) {
+                    if ($date->between(Carbon::parse($holiday->from_date), Carbon::parse($holiday->to_date))) {
+                        $isHoliday = true;
+                        break;
+                    }
+                }
+    
+                if (!$isHoliday) {
+                    $totalWorkDays++;
+                }
             }
         }
 
@@ -194,13 +232,17 @@ public function totalSalaryAmount($month = null, $year = null)
     $month = $month ?: now()->month;
     $year = $year ?: now()->year;
     $workDays = $this->getWorkDaysAttribute($month, $year);
+    $AbsenceDays=$this->getAbsenceDaysAttribute($month , $year );
     $bonusDeductionData = $this->calculateMonthlyBonusDeduction($month, $year);
     $bonusAmount = $bonusDeductionData['total_bonus'];
     $deductionAmount = $bonusDeductionData['total_deduction'];
     $salaryPerMinute = $this->salaryPerMinute();
     $totalWorkingMinutes = $workDays * 8 * 60;
+    $totalAbsenceDaysMinutes=$AbsenceDays* 8 * 60;
+
     $baseSalary = $totalWorkingMinutes * $salaryPerMinute;
-    return $baseSalary + $bonusAmount - $deductionAmount;
+    return $this->salary + $bonusAmount - $deductionAmount - ($totalAbsenceDaysMinutes* $salaryPerMinute );
+    // return ($totalAbsenceDaysMinutes* $salaryPerMinute );
 }
 
 }

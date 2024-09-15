@@ -34,7 +34,6 @@ class HolidaysController extends Controller
             'description' => 'required|string|max:255',
             'from_date' => 'required|date',
             'to_date' => 'required|date',
-            'numberOfDays' => 'required|integer',
           ]);
 
           if($validateDate->fails()){
@@ -69,7 +68,6 @@ class HolidaysController extends Controller
             'description' => 'required|string|max:255',
             'from_date' => 'required|date',
             'to_date' => 'required|date',
-            'numberOfDays' => 'required|integer',
           ]);
 
           if($validateDate->fails()){
@@ -85,7 +83,7 @@ class HolidaysController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        
         $holiday = Annual_Holidays::find($id);
         if (!$holiday) {
             return response()->json(['message' => 'holiday not found'], 404);
