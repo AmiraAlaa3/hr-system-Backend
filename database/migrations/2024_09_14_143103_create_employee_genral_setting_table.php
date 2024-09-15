@@ -11,14 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('adjustments', function (Blueprint $table) {
+        Schema::create('employee_genral_setting', function (Blueprint $table) {
             $table->id();
-            $table->date('date');
-            $table->integer('houres');
-            $table->string('reason');
-            $table->enum('status',['approved','Unapproved','New']);
-            $table->enum('type',['bouns','dedeuction']);
-            $table->string('approvedBY');
+            $table->foreignId('employee_id')->constrained('employees')->onDelete('cascade');
+            $table->foreignId('genral_setting_id')->constrained('genral_settings')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -28,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('adjustments');
+        Schema::dropIfExists('employee_genral_setting');
     }
 };

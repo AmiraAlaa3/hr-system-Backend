@@ -17,10 +17,7 @@ class Attendnce extends Model
 
     ];
 
-    public function attendanceAdjustments()
-    {
-        return $this->hasMany(EmployeeAttendanceAdjustment::class,'attendance_id');
-    }
+ 
 
     public function employee()
     {

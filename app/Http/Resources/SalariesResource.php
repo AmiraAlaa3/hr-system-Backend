@@ -19,17 +19,20 @@ class SalariesResource extends JsonResource
         return [
             'name' => $this->name,
             'salary' => $this->salary,
-            'checkin' => $this->attendanceAdjustments->first()->attendance->checkIN ?? null,
-            'date' => $this->attendanceAdjustments->first()->adjustment->date ?? null,
-            'checkOUT' => $this->attendanceAdjustments->first()->attendance->checkOUT ?? null,
+            'checkin' => $this->check_in_time ?? null,
+            // 'date' => $month ?? null,
+            'checkOUT' => $this->check_out_time ?? null,
             'work_days' =>  $this->getWorkDaysAttribute($month, $year),  // Using the dynamic value or fallback
             'absence_days' => $this->getAbsenceDaysAttribute($month, $year),
-            'total_bonus_hours' => $this->totalBonusHours($month, $year),
-            'total_deduction_hours' => $this->totalDeductionsHours($month, $year),
-            'bonus_amount' => $this->totalBounsAmount($month, $year),
-            'deductions_amount' => $this->totalDeductionAmount($month, $year),
+            'total_bonus_hours' => $this->calculateMonthlyBonusDeduction($month, $year)['bonus_hours'],
+            'total_deduction_hours' => $this->calculateMonthlyBonusDeduction($month, $year)['deduction_hours'],
+            'bonus_amount' => $this->calculateMonthlyBonusDeduction($month, $year)['total_bonus'],
+            'deductions_amount' => $this->calculateMonthlyBonusDeduction($month, $year)['total_deduction'],
             'salary_cal'=>$this->salaryPerMinute(),
             'total_salary'=>$this->totalSalaryAmount($month , $year),
+            'department' => [
+                                'name' => $this->department ? $this->department->name : null,
+                            ],
         ];
         
 //         return [
