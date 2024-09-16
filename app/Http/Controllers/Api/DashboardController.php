@@ -21,8 +21,10 @@ class DashboardController extends Controller
             $totalUsers = User::count();
             $totalLeaves = Annual_Holidays::count();
             $nextLeave = Annual_Holidays::where('date', '>=', now())->first();
-            $emplyeeAndDepartment = Department::withCount('employees')->get();
-
+            $departmentCounts = Department::withCount('employees')->get();
+            $departments = $departmentCounts->pluck('name');
+            $employeeCounts = $departmentCounts->pluck('employees_count');
+    
             return response()->json([
                 'totalEmployee' => $totalEmployee,
                 'totalUsers' => $totalUsers,
@@ -31,8 +33,8 @@ class DashboardController extends Controller
                     'title' => $nextLeave->title,
                     'date' => $nextLeave->date,
                 ] : null,
-                'departments' => $emplyeeAndDepartment->pluck('name'),
-                'employeeCounts' => $emplyeeAndDepartment->pluck('employees_count'),
+                'departments' => $departments,
+                'employeeCounts' => $employeeCounts,
             ], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
