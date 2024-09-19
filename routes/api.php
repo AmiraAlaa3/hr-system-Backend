@@ -131,7 +131,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware('check.permission:user,delete')->group(function () {
         Route::delete('users/{user}', [UserController::class, 'destroy']);
     });
-
     // Groups
     Route::middleware('check.permission:group,view')->group(function () {
         Route::get('groups', [GroupController::class, 'index']);
