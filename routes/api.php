@@ -133,14 +133,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     // Groups
-    Route::middleware('check.permission:salary,view')->group(function () {
+    Route::middleware('check.permission:group,view')->group(function () {
         Route::get('groups', [GroupController::class, 'index']);
         Route::get('groups/{group}', [GroupController::class, 'show']);
     });
-    Route::middleware('check.permission:salary,add')->group(function () {
+    Route::middleware('check.permission:group,add')->group(function () {
         Route::post('groups', [GroupController::class, 'store']);
     });
-    Route::middleware('check.permission:salary,delete')->group(function () {
+    Route::middleware('check.permission:group,delete')->group(function () {
         Route::delete('groups/{group}', [GroupController::class, 'destroy']);
     });
 });

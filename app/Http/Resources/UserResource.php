@@ -21,11 +21,11 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'password' => $this->password,
-            // Return the group data with both group ID and name
             'group' => [
-                'id' => $this->groups->first()->id, 
-                'name' => $this->groups->first()->name,
-            ]
+                'id' => $this->groups ? $this->groups->id : null,
+                'name' => $this->groups ? $this->groups->name : null,
+            ],
+
         ];
     }
 }

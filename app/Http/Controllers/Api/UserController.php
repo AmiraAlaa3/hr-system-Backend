@@ -19,42 +19,42 @@ class UserController extends Controller
     public function index()
     {
         $users = User::with(['groups.permissions'])->get();
-
         return UserResource::collection($users);
-        
-
     }
 
-    
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
+    {
 
-{
-    // Validate a single g  roup_id
-    $validatedData = $request->validate([
-        'name' => 'required|string|max:255',
-        'Full_name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users',
-        'password' => 'required|string|min:8',
-        'group_id' => 'required|exists:groups,id',  // Validate a single group_id
-    ]);
+        $validatedData = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'Full_name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'nullable|string|min:8',
+            'group_id' => 'required|exists:groups,id',
+        ]);
 
-    // Create the user
-    $user = User::create([
-        'name' => $validatedData['name'],
-        'Full_name' => $validatedData['Full_name'], 
-        'email' => $validatedData['email'],
-        'password' => Hash::make($validatedData['password']),
-    ]);
+        if ($validatedData->fails()) {
+            return response()->json($validatedData->errors(), 400);
+        }
+
+        $validatedData = $validatedData->validated();
+
+        // Update the user details
+        $user = User::create([
+            'name' => $validatedData['name'],
+            'email' => $validatedData['email'],
+            'Full_name' => $validatedData['Full_name'],
+            'password' => Hash::make($validatedData['password']),
+            'group_id' => $validatedData['group_id'],
+        ]);
 
 
-    // Attach the single group
-    $user->groups()->sync([$validatedData['group_id']]);  // Sync single group as an array
+        return new UserResource($user);
+    }
 
-    return new UserResource($user);
-}
     /**
      * Display the specified resource.
      */
@@ -74,14 +74,19 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // Validate a single group_id
-        $validatedData = $request->validate([
+        $validatedData = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'Full_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
             'password' => 'nullable|string|min:8',
             'group_id' => 'required|exists:groups,id',
         ]);
+
+        if ($validatedData->fails()) {
+            return response()->json($validatedData->errors(), 400);
+        }
+
+        $validatedData = $validatedData->validated();
 
         $user = User::findOrFail($id);
 
@@ -91,13 +96,13 @@ class UserController extends Controller
             'email' => $validatedData['email'],
             'Full_name' => $validatedData['Full_name'],
             'password' => $request->filled('password') ? Hash::make($validatedData['password']) : $user->password,
+            'group_id' => $validatedData['group_id'],
         ]);
 
-        // Attach the single group
-        $user->groups()->sync([$validatedData['group_id']]);  // Sync single group as an array
 
         return new UserResource($user);
     }
+
     /**
      * Remove the specified resource from storage.
      */
@@ -109,6 +114,6 @@ class UserController extends Controller
         $user->delete();
 
         // Return a success response
-        return response()->json([  'message' => 'User successfully deleted' ], Response::HTTP_OK);
+        return response()->json(['message' => 'User successfully deleted'], Response::HTTP_OK);
     }
 }
