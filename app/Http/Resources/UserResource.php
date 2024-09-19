@@ -17,6 +17,7 @@ class UserResource extends JsonResource
 
         return [
             'id' => $this->id,
+            'Full_name'=> $this->Full_name,
             'name' => $this->name,
             'email' => $this->email,
             'password' => $this->password,
@@ -24,27 +25,7 @@ class UserResource extends JsonResource
             'group' => [
                 'id' => $this->groups->first()->id, 
                 'name' => $this->groups->first()->name,
-            ],
-            'permissions' => $this->groups->first()->permissions->map(function ($permission) {
-                $permissions = [];
-        
-                if ($permission->add === 'true') {  
-                    $permissions[] = 'add';
-                }
-
-                if ($permission->edit === 'true') {
-                    $permissions[] = 'edit';
-                }
-                if ($permission->view === 'true') {
-                    $permissions[] = 'view';
-                }
-                if ($permission->delete === 'true') {
-                    $permissions[] = 'delete';
-                }
-        
-                return $permissions;
-
-            }),
+            ]
         ];
     }
 }

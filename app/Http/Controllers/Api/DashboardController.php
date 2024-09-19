@@ -1,32 +1,75 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\api;
+
 use App\Http\Controllers\Controller;
-use App\Http\Resources\DashboardResource;
 use App\Models\Annual_Holidays;
-use App\Models\Dashboard;
+use App\Models\Department;
 use App\Models\Employee;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function countDashboard()
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
     {
-        $totalEmployee = Employee::count();
-        $totalUsers = User::count();
-        $totalLeaves = Annual_Holidays::count();
-        $nextLeave = Annual_Holidays::where('date', '>=', now())->first();
-
-        dd($totalEmployee);
-        return response()->json([
-            'totalEmployee' => $totalEmployee,
-            'totalUsers' => $totalUsers,
-            'totalLeaves' => $totalLeaves,
-            'nextLeave' => $nextLeave ? $nextLeave->date : null
-        ], 200);
+        try {
+            $totalEmployee = Employee::count();
+            $totalUsers = User::count();
+            $totalLeaves = Annual_Holidays::count();
+            $nextLeave = Annual_Holidays::where('date', '>=', now())->first();
+            $departmentCounts = Department::withCount('employees')->get();
+            $departments = $departmentCounts->pluck('name');
+            $employeeCounts = $departmentCounts->pluck('employees_count');
+    
+            return response()->json([
+                'totalEmployee' => $totalEmployee,
+                'totalUsers' => $totalUsers,
+                'totalLeaves' => $totalLeaves,
+                'nextLeave' => $nextLeave ? [
+                    'title' => $nextLeave->title,
+                    'date' => $nextLeave->date,
+                ] : null,
+                'departments' => $departments,
+                'employeeCounts' => $employeeCounts,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
 }
