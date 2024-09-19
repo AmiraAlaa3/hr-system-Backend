@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Group;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
@@ -17,20 +18,21 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::with(['groups.permissions'])->get();
+        // $users = User::with(['groups.permissions'])->get();
 
-        return UserResource::collection($users);
-
+        // return UserResource::collection($users);
+        
 
     }
 
+    
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
 
 {
-    // Validate a single group_id
+    // Validate a single g  roup_id
     $validatedData = $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|string|email|max:255|unique:users',

@@ -1,15 +1,17 @@
 <?php
 
-namespace App\Models;
+    namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+    use Illuminate\Database\Eloquent\Factories\HasFactory;
+    use Illuminate\Database\Eloquent\Model;
 
-class Permission extends Model
-{
-    use HasFactory;
-    public function groups()
+    class Permission extends Model
     {
-        return $this->belongsToMany(Group::class,'groups_permissions');
+        use HasFactory;
+        protected $fillable = [
+        'name','page','add','delete','edit','view'];
+        public function groups()
+        {
+            return $this->belongsToMany(Group::class,'groups_permissions');
+        }
     }
-}

@@ -1,7 +1,7 @@
 <?php
 
-namespace App\Http\Controllers;
-
+namespace App\Http\Controllers\Api;
+use App\Http\Controllers\Controller;
 use App\Http\Resources\DashboardResource;
 use App\Models\Annual_Holidays;
 use App\Models\Dashboard;
