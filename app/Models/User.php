@@ -22,7 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'Full_name',
-
+        'group_id',
     ];
 
     /**
@@ -47,10 +47,10 @@ class User extends Authenticatable
     public function hasPermission($permission)
     {
         $permissions = $this->group->permissions; // Collection of permission objects
-        
+
         // Find the permission object for the specific page
         $permissionObject = $permissions->firstWhere('page', $permission);
-    
+
         // Return true if permission object exists and view permission is true
         return $permissionObject && $permissionObject->view === 'true';
     }
