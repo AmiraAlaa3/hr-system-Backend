@@ -1,21 +1,18 @@
 <?php
-
-use App\Http\Controllers\Api\DepartmentController;
-use App\Http\Controllers\Api\EmployeeController;
-
-use App\Http\Controllers\Api\HolidaysController;
-use App\Http\Controllers\Api\SalariesController;
-use App\Http\Controllers\Api\AttendanceController;
-use App\Http\Controllers\Api\Controller;
-use App\Http\Controllers\Api\genral_settingController;
-use App\Http\Controllers\Api\LoginController;
-use App\Models\GenralSetting;
-use App\Http\Controllers\Api\DashboardController;
-use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\GroupController;
-use App\Http\Controllers\UserController as ControllersUserController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\{
+    DepartmentController,
+    EmployeeController,
+    HolidaysController,
+    SalariesController,
+    AttendanceController,
+    DashboardController,
+    UserController,
+    GroupController,
+    genral_settingController,
+    LoginController
+};
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,55 +25,122 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
-
-
-
-
-//Login
+// Authentication
 Route::post('login', [LoginController::class, 'login']);
+Route::middleware(['auth:sanctum'])->post('logout', [LoginController::class, 'logout']);
+
+// Protected Routes
 Route::middleware(['auth:sanctum'])->group(function () {
-    //Dashboard
+
+    // Dashboard
     Route::get('dashboard', [DashboardController::class, 'index']);
 
-    // employees
+    // Employees
+    Route::middleware('check.permission:employee,view')->group(function () {
+        Route::get('employees', [EmployeeController::class, 'index']);
+        Route::get('employees/search', [EmployeeController::class, 'search']);
+        Route::get('employees/{employee}', [EmployeeController::class, 'show']);
+    });
+    Route::middleware('check.permission:employee,add')->group(function () {
+        Route::post('employees', [EmployeeController::class, 'store']);
+    });
+    Route::middleware('check.permission:employee,edit')->group(function () {
+        Route::put('employees/{employee}', [EmployeeController::class, 'update']);
+    });
+    Route::middleware('check.permission:employee,delete')->group(function () {
+        Route::delete('employees/{employee}', [EmployeeController::class, 'destroy']);
+    });
 
-    Route::get('employees/search', [EmployeeController::class, 'search']);
-    Route::apiResource('employees', EmployeeController::class);
+    // Departments
+    Route::middleware('check.permission:department,view')->group(function () {
+        Route::get('departments', [DepartmentController::class, 'index']);
+        Route::get('departments/search', [DepartmentController::class, 'search']);
+        Route::get('departments/{department}', [DepartmentController::class, 'show']);
+    });
+    Route::middleware('check.permission:department,add')->group(function () {
+        Route::post('departments', [DepartmentController::class, 'store']);
+    });
+    Route::middleware('check.permission:department,edit')->group(function () {
+        Route::put('departments/{department}', [DepartmentController::class, 'update']);
+    });
+    Route::middleware('check.permission:department,delete')->group(function () {
+        Route::delete('departments/{department}', [DepartmentController::class, 'destroy']);
+    });
 
-    // departments
-    Route::get('departments/search', [DepartmentController::class, 'search']);
-    Route::apiResource('departments', DepartmentController::class);
+    // Salaries
+    Route::middleware('check.permission:salary,view')->group(function () {
+        Route::get('salaries', [SalariesController::class, 'index']);
+        Route::get('salary/search', [SalariesController::class, 'search']);
+        Route::get('salary/search-by-month-year', [SalariesController::class, 'calculateBonusDeduction']);
+        Route::get('salaries/{salary}', [SalariesController::class, 'show']);
+    });
+    Route::middleware('check.permission:salary,add')->group(function () {
+        Route::post('salaries', [SalariesController::class, 'store']);
+    });
 
-    // attendances
-    Route::apiResource('attendances', AttendanceController::class);
-    Route::get('attendances/search', [AttendanceController::class, 'search']);
-    Route::get('attendances/filter', [AttendanceController::class, 'filterByDate']);
-    Route::post('attendances/ExcelImport', [AttendanceController::class, 'ExcelImport']);
+    // Attendances
+    Route::middleware('check.permission:attendance,view')->group(function () {
+        Route::get('attendances', [AttendanceController::class, 'index']);
+        Route::get('attendances/search', [AttendanceController::class, 'search']);
+        Route::get('attendances/filter', [AttendanceController::class, 'filterByDate']);
+        Route::get('attendances/{attendance}', [AttendanceController::class, 'show']);
+    });
+    Route::middleware('check.permission:attendance,add')->group(function () {
+        Route::post('attendances', [AttendanceController::class, 'store']);
+        Route::post('attendances/ExcelImport', [AttendanceController::class, 'ExcelImport']);
+    });
+    Route::middleware('check.permission:attendance,edit')->group(function () {
+        Route::put('attendances/{attendance}', [AttendanceController::class, 'update']);
+    });
+    Route::middleware('check.permission:attendance,delete')->group(function () {
+        Route::delete('attendances/{attendance}', [AttendanceController::class, 'destroy']);
+    });
 
+    // Holidays
+    Route::middleware('check.permission:holiday,view')->group(function () {
+        Route::get('holidays', [HolidaysController::class, 'index']);
+        Route::get('holidays/{holiday}', [HolidaysController::class, 'show']);
+    });
+    Route::middleware('check.permission:holiday,add')->group(function () {
+        Route::post('holidays', [HolidaysController::class, 'store']);
+    });
+    Route::middleware('check.permission:holiday,edit')->group(function () {
+        Route::put('holidays/{holiday}', [HolidaysController::class, 'update']);
+    });
+    Route::middleware('check.permission:holiday,delete')->group(function () {
+        Route::delete('holidays/{holiday}', [HolidaysController::class, 'destroy']);
+    });
 
+    // General Settings
+    Route::middleware('check.permission:settings,edit')->group(function () {
+        Route::get('setting', [genral_settingController::class, 'index']);
+        Route::put('setting/{id}', [genral_settingController::class,'update']);
+    });
 
-// salaries
-Route::get('salarys', [SalariesController::class, 'index']);
-Route::get('salary/search', [SalariesController::class, 'search']);
-Route::get('salary/search-by-month-year', [SalariesController::class, 'calculateBonusDeduction']);
-Route::get('salary/{id}', [SalariesController::class, 'show']);
-// Route::patch('salary/{id}', [SalariesController::class, 'update']);
-Route::get('check/{id}', [SalariesController::class, 'calculateBonusDeduction']);
-// Route::get('bonus/{id}', [SalariesController::class, 'calculateBonusDeduction']);
+    // Users
+    Route::middleware('check.permission:user,view')->group(function () {
+        Route::get('users', [UserController::class, 'index']);
+        Route::get('users/{user}', [UserController::class, 'show']);
+    });
+    Route::middleware('check.permission:user,add')->group(function () {
+        Route::post('users', [UserController::class, 'store']);
+    });
+    Route::middleware('check.permission:user,edit')->group(function () {
+        Route::put('users/{user}', [UserController::class, 'update']);
+    });
+    Route::middleware('check.permission:user,delete')->group(function () {
+        Route::delete('users/{user}', [UserController::class, 'destroy']);
+    });
 
-// setting
-
-Route::get('setting', [genral_settingController::class, 'index']);
-Route::put('setting/{id}', [genral_settingController::class, 'update']);
-
-    Route::apiResource('holidays', HolidaysController::class);
-    Route::apiResource('users', UserController::class);
-    Route::apiResource('groups', GroupController::class);
-    Route::post('logout', [LoginController::class, 'logout']);
-
-
+    // Groups
+    Route::middleware('check.permission:salary,view')->group(function () {
+        Route::get('groups', [GroupController::class, 'index']);
+        Route::get('groups/{group}', [GroupController::class, 'show']);
+    });
+    Route::middleware('check.permission:salary,add')->group(function () {
+        Route::post('groups', [GroupController::class, 'store']);
+    });
+    Route::middleware('check.permission:salary,delete')->group(function () {
+        Route::delete('groups/{group}', [GroupController::class, 'destroy']);
+    });
 });
