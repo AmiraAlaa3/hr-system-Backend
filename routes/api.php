@@ -116,7 +116,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('setting', [genral_settingController::class, 'index']);
         Route::put('setting/{id}', [genral_settingController::class,'update']);
     });
-
     // Users
     Route::middleware('check.permission:user,view')->group(function () {
         Route::get('users', [UserController::class, 'index']);
