@@ -154,6 +154,10 @@ class Employee extends Model
         $presentDays = $this->attendances()
             ->whereMonth('date', $month)
             ->whereYear('date', $year)
+            ->where(function ($query) use ($weekend1, $weekend2) {
+                $query->whereRaw('DAYOFWEEK(date) != ?', [$weekend1])
+                      ->whereRaw('DAYOFWEEK(date) != ?', [$weekend2]);
+            })
             ->distinct('date')
             ->count('date');
 
