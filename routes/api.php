@@ -67,9 +67,11 @@ Route::get('salary/{id}', [SalariesController::class, 'show']);
 // Route::patch('salary/{id}', [SalariesController::class, 'update']);
 Route::get('check/{id}', [SalariesController::class, 'calculateBonusDeduction']);
 // Route::get('bonus/{id}', [SalariesController::class, 'calculateBonusDeduction']);
-Route::put('weekend/{id}', [genral_settingController::class, 'update']);
 
+// setting
 
+Route::get('setting', [genral_settingController::class, 'index']);
+Route::put('setting/{id}', [genral_settingController::class, 'update']);
 
 
     
