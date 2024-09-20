@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\{
     DashboardController,
     UserController,
     GroupController,
+    PermissionController,
     genral_settingController,
     LoginController
 };
@@ -141,4 +142,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware('check.permission:group,delete')->group(function () {
         Route::delete('groups/{group}', [GroupController::class, 'destroy']);
     });
+    //permission
+    // Route::middleware('check.permission:permission,add')->group(function () {
+        Route::get('permissions/{permission}', [PermissionController::class, 'show']);
+        Route::post('permissions', [PermissionController::class, 'store']);
+    // });
 });
