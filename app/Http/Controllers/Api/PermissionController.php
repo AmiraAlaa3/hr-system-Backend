@@ -23,7 +23,26 @@ class PermissionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
+        $request->validate([
+            'page' => 'required|string',
+            'add' => 'required|in:true,false',
+            'delete' => 'required|in:true,false',
+            'edit' => 'required|in:true,false',
+            'view' => 'required|in:true,false',
+        ]);
+
+        $permission = Permission::create([
+            'page' => $request->page,
+            'add' => $request->add,
+            'delete' => $request->delete,
+            'edit' => $request->edit,
+            'view' => $request->view,
+        ]);
+
+        $permission = Permission::create($request->only('page', 'add', 'delete', 'edit', 'view'));
+
+        return new PermissionResource($permission);
     }
 
     /**

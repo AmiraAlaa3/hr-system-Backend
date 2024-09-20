@@ -22,7 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'Full_name',
-
+        'group_id',
     ];
 
     /**
@@ -44,13 +44,24 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+    public function hasPermission($permission)
+    {
+        $permissions = $this->group->permissions; // Collection of permission objects
+
+        // Find the permission object for the specific page
+        $permissionObject = $permissions->firstWhere('page', $permission);
+
+        // Return true if permission object exists and view permission is true
+        return $permissionObject && $permissionObject->view === 'true';
+    }
+
     public function employees()
     {
         return $this->belongsToMany(Employee::class,'hrs_empolyees');
     }
     public function groups()
     {
-        return $this->belongsToMany(Group::class,'users_groups');
+        return $this->belongsTo(Group::class,'group_id');
     }
     public function subordinates()
     {

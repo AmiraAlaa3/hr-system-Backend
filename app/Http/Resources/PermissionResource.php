@@ -14,6 +14,15 @@ class PermissionResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'page' => $this->page,
+            'add' => $this->add === 'true',
+            'delete' => $this->delete === 'true',
+            'edit' => $this->edit === 'true',
+            'view' => $this->view === 'true',
+            'created_at' => $this->created_at->toDateTimeString(),
+            'updated_at' => $this->updated_at->toDateTimeString(),
+        ];
     }
 }

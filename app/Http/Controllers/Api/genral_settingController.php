@@ -16,15 +16,6 @@ class genral_settingController extends Controller
         $generalSetting = GenralSetting::all();
         return SettingResource::collection($generalSetting);
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -42,14 +33,6 @@ class genral_settingController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
@@ -59,6 +42,7 @@ class genral_settingController extends Controller
             'weekend2' => 'required|string|in:Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
             'bonusHours' => 'required|integer|min:1',
             'deductionsHours' => 'required|integer|min:1',
+
         ]);
 
         // Check if the same day is selected for both weekends

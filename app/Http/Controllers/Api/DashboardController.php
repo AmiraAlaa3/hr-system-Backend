@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Annual_Holidays;
+use App\Models\Department;
 use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -20,7 +21,10 @@ class DashboardController extends Controller
             $totalUsers = User::count();
             $totalLeaves = Annual_Holidays::count();
             $nextLeave = Annual_Holidays::where('date', '>=', now())->first();
-
+            $departmentCounts = Department::withCount('employees')->get();
+            $departments = $departmentCounts->pluck('name');
+            $employeeCounts = $departmentCounts->pluck('employees_count');
+    
             return response()->json([
                 'totalEmployee' => $totalEmployee,
                 'totalUsers' => $totalUsers,
@@ -29,6 +33,8 @@ class DashboardController extends Controller
                     'title' => $nextLeave->title,
                     'date' => $nextLeave->date,
                 ] : null,
+                'departments' => $departments,
+                'employeeCounts' => $employeeCounts,
             ], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
