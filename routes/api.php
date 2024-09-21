@@ -148,3 +148,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('permissions', [PermissionController::class, 'store']);
     // });
 });
+

@@ -26,7 +26,19 @@ class GroupController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validateData = $request->validate([
+            'name' => 'required|string|max:255|unique:groups,name',
+            'permission_ids' => 'required|array',
+            'permission_ids.*' => 'exists:permissions,id'
+        ]);
+    
+        $group = Group::create([
+            'name' => $validateData['name']
+        ]);
+    
+        $group->permissions()->sync($validateData['permission_ids']);
+    
+        return new GroupResource($group);
     }
 
     /**
