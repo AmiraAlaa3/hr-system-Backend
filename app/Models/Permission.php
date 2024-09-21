@@ -8,8 +8,7 @@
     class Permission extends Model
     {
         use HasFactory;
-        protected $fillable = [
-        'name','page','add','delete','edit','view'];
+        protected $fillable = ['page','add','delete','edit','view'];
         public function groups()
         {
             return $this->belongsToMany(Group::class,'groups_permissions');
