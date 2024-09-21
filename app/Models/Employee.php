@@ -95,7 +95,7 @@ class Employee extends Model
 
             ->where(function($query) use ($weekend1, $weekend2) {
                 $query->whereRaw('WEEKDAY(date) != ?', [$weekend1-1])
-                ->whereRaw('WEEKDAY(date) != ?', [$weekend2-1]);
+                      ->whereRaw('WEEKDAY(date) != ?', [$weekend2-1]);
             })
             ->distinct('date')
             ->count('date');

@@ -50,13 +50,18 @@ class GroupController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+       $group = Group::find($id);
+       if (!$group) {
+           return response()->json(['message' => 'group not found'], 404);
+       }
+       $group->delete();
+        return response()->json(['message' => 'Group deleted successfully.']);
     }
     public function assignPermissions(Request $request, $groupId)
     {
         // Fetch the group by ID
         $group = Group::findOrFail($groupId);
-        
+
         // Get permissions from the request
         $permissions = Permission::whereIn('page', $request->input('permissions'))->get();
 
