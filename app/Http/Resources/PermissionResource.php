@@ -10,9 +10,10 @@ class PermissionResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @return array<string, mixed>
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
      */
-    public function toArray(Request $request): array
+    public function toArray($request)
     {
         return [
             'id' => $this->id,
@@ -26,3 +27,4 @@ class PermissionResource extends JsonResource
         ];
     }
 }
+

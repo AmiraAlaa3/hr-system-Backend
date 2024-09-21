@@ -7,23 +7,17 @@ use Illuminate\Http\Request;
 use App\Models\Permission;
 use App\Http\Resources\PermissionResource;
 
+
 class PermissionController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        $permissions= Permission::all();
-        return PermissionResource::collection($permissions);
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * Store a newly created permission in the database.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
-        
         $request->validate([
             'page' => 'required|string',
             'add' => 'required|in:true,false',
@@ -46,26 +40,46 @@ class PermissionController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display a listing of the permissions.
+     *
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function show(string $id)
+    public function index()
     {
-        //
+//
     }
 
     /**
-     * Update the specified resource in storage.
+     * Show a specific permission.
+     *
+     * @param \App\Models\Permission $permission
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, string $id)
+    public function show(Permission $permission)
     {
-        //
+        return new PermissionResource($permission);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Update the specified permission.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Models\Permission $permission
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(string $id)
+    public function update(Request $request, Permission $permission)
     {
-        //
+//
+    }
+
+    /**
+     * Remove the specified permission from storage.
+     *
+     * @param \App\Models\Permission $permission
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy(Permission $permission)
+    {
+    //
     }
 }

@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\{
     DashboardController,
     UserController,
     GroupController,
+    PermissionController,
     genral_settingController,
     LoginController
 };
@@ -79,20 +80,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     // Attendances
-    Route::middleware('check.permission:attendance,view')->group(function () {
+    Route::middleware('check.permission:salary,view')->group(function () {
         Route::get('attendances', [AttendanceController::class, 'index']);
         Route::get('attendances/search', [AttendanceController::class, 'search']);
         Route::get('attendances/filter', [AttendanceController::class, 'filterByDate']);
         Route::get('attendances/{attendance}', [AttendanceController::class, 'show']);
     });
-    Route::middleware('check.permission:attendance,add')->group(function () {
+    Route::middleware('check.permission:salary,add')->group(function () {
         Route::post('attendances', [AttendanceController::class, 'store']);
         Route::post('attendances/ExcelImport', [AttendanceController::class, 'ExcelImport']);
     });
-    Route::middleware('check.permission:attendance,edit')->group(function () {
+    Route::middleware('check.permission:salary,edit')->group(function () {
         Route::put('attendances/{attendance}', [AttendanceController::class, 'update']);
     });
-    Route::middleware('check.permission:attendance,delete')->group(function () {
+    Route::middleware('check.permission:salary,delete')->group(function () {
         Route::delete('attendances/{attendance}', [AttendanceController::class, 'destroy']);
     });
 
@@ -116,7 +117,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('setting', [genral_settingController::class, 'index']);
         Route::put('setting/{id}', [genral_settingController::class,'update']);
     });
-
     // Users
     Route::middleware('check.permission:user,view')->group(function () {
         Route::get('users', [UserController::class, 'index']);
@@ -142,6 +142,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware('check.permission:group,delete')->group(function () {
         Route::delete('groups/{group}', [GroupController::class, 'destroy']);
     });
-    // permission 
-    Route::post('permissions', [PermissionController::class, 'store']);
+    //permission
+    // Route::middleware('check.permission:permission,add')->group(function () {
+        Route::get('permissions/{permission}', [PermissionController::class, 'show']);
+        Route::post('permissions', [PermissionController::class, 'store']);
+    // });
 });
+
