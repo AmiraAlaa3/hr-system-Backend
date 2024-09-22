@@ -92,6 +92,7 @@ class Employee extends Model
         return $this->attendances()
             ->whereMonth('date', $month)
             ->whereYear('date', $year)
+
             ->where(function($query) use ($weekend1, $weekend2) {
                 $query->whereRaw('WEEKDAY(date) != ?', [$weekend1-1])
                       ->whereRaw('WEEKDAY(date) != ?', [$weekend2-1]);
