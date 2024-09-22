@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Group extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'name'
+    ];
     public function permissions()
     {
         return $this->belongsToMany(Permission::class,'groups_permissions');

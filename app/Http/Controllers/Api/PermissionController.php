@@ -34,7 +34,7 @@ class PermissionController extends Controller
             'view' => $request->view,
         ]);
 
-        $permission = Permission::create($request->only('page', 'add', 'delete', 'edit', 'view'));
+        // $permission = Permission::create($request->only('page', 'add', 'delete', 'edit', 'view'));
 
         return new PermissionResource($permission);
     }
