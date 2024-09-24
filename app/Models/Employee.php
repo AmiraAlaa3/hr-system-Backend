@@ -179,7 +179,6 @@ class Employee extends Model
     {
         $month = $month ?: Carbon::now()->month;
         $year = $year ?: Carbon::now()->year;
-
         $attendances = $this->attendances()
             ->whereMonth('date', $month)
             ->whereYear('date', $year)
@@ -187,16 +186,12 @@ class Employee extends Model
 
         $totalBonus = 0;
         $totalDeduction = 0;
-
         $workStartTime = Carbon::createFromTimeString($this->check_in_time);
         $workEndTime = Carbon::createFromTimeString($this->check_out_time);
 
         $setting = $this->settings()->first();
-        // Get the bonus and deduction hours from settings
         $bonusHours = $setting ? $setting->bonusHours : 1;
         $deductionHours = $setting ? $setting->deductionsHours : 1;
-
-        // Initialize counters for minutes
         $bonusMinutes = 0;
         $earlyLeaveMinutes = 0;
         $deductionMinutes = 0;
@@ -206,12 +201,9 @@ class Employee extends Model
             $checkOutTime = $attendance->checkOUT ? Carbon::parse($attendance->checkOUT) : null;
 
             if ($checkInTime && $checkOutTime) {
-                // Deduct for late arrival
                 if ($checkInTime->greaterThan($workStartTime)) {
                     $deductionMinutes += $checkInTime->diffInMinutes($workStartTime);
                 }
-
-                // Deduct for early leave, else add bonus for overtime
                 if ($checkOutTime->lessThan($workEndTime)) {
                     $earlyLeaveMinutes += $workEndTime->diffInMinutes($checkOutTime);
                 } elseif ($checkOutTime->greaterThan($workEndTime)) {
@@ -219,8 +211,6 @@ class Employee extends Model
                 }
             }
         }
-
-        // Calculate the total deduction and bonus with hours applied as multipliers
         $totalBonus = ($bonusMinutes * $this->salaryPerMinute()) * $bonusHours;
         $totalDeduction = (($earlyLeaveMinutes + $deductionMinutes) * $this->salaryPerMinute()) * $deductionHours;
 
@@ -259,7 +249,6 @@ public function totalSalaryAmount($month = null, $year = null)
 
     $baseSalary = $totalWorkingMinutes * $salaryPerMinute;
     return $this->salary + $bonusAmount - $deductionAmount - ($totalAbsenceDaysMinutes* $salaryPerMinute );
-    // return ($totalAbsenceDaysMinutes* $salaryPerMinute );
 }
 
 }

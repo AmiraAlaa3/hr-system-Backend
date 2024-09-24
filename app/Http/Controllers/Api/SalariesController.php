@@ -47,10 +47,10 @@ class SalariesController extends Controller
     public function show($id)
     {
 
-        
+
         $employee = Employee::with(['attendances'])
         ->findOrFail($id);
-     
+
         return new SalariesResource($employee);
     }
 
@@ -61,55 +61,6 @@ class SalariesController extends Controller
     {
         //
     }
-// public function update(Request $request, $id)
-// {
-//     // Validate the incoming request
-//     $validator = Validator::make($request->all(), [
-//         'work_days' => 'integer|min:0',
-//         'salary' => 'required|numeric',
-//         'bonuses.*.houres' => 'required|nullable|integer',
-//     ]);
-
-//     if ($validator->fails()) {
-//         return response()->json($validator->errors(), 400);
-//     }
-
-//     // Find the employee with related models
-//     $employee = Employee::with(['attendanceAdjustments.attendance', 'attendanceAdjustments.adjustment'])
-//         ->findOrFail($id);
-
-
-//     $validated = $validator->validated();
-//     $employee->fill($validated);
-
-//     if ($request->has('work_days')) {
-//         $workDays = $request->input('work_days');
-//         $employee->updateWorkDays($workDays);
-//     }
-//     if ($request->has('bonuses.*.houres')) {
-//         $totalhours=  $request->input('bonuses.*.houres') ;
-//         $employee->newtotalBonusHours($totalhours);
-//     }
-
-//     $employee->save();
-
-//     // Return the updated employee data with work_days
-//     return new SalariesResource($employee);
-// }
-
-
-
-
-    // public function hamed($num)
-    // {
-    //     // Simply return the passed value or handle other logic if necessary
-    //     return $num;
-    // }
-
-
-
-
- 
 
     /**
      * Remove the specified resource from storage.
@@ -119,36 +70,68 @@ class SalariesController extends Controller
         //
     }
 
+    // public function search(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'name' => 'required|string|max:255',
+    //     ]);
+    //     if ($validator->fails()) {
+    //         return response()->json($validator->errors(), 400);
+    //     }
+    //     $name = $request->input('name');
+    //     $employee = Employee::where('name', 'LIKE', '%' . $name . '%')->get();
+    //     if ($employee->isEmpty()) {
+    //         return response()->json(['message' => 'Employee not found'], 404);
+    //     }
+
+    //     return SalariesResource::collection($employee);
+    // }
+
     public function search(Request $request)
     {
+        // Validate the incoming request
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
+            'month' => 'required|integer|between:1,12',
+            'year'  => 'required|integer|min:2000',
         ]);
+
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
+
         $name = $request->input('name');
-        $employee = Employee::where('name', 'LIKE', '%' . $name . '%')->get();
-        if ($employee->isEmpty()) {
-            return response()->json(['message' => 'Employee not found'], 404);
+        $month = $request->input('month');
+        $year = $request->input('year');
+
+        // Find employees whose name matches and have attendance records for the given month and year
+        $employees = Employee::where('name', 'LIKE', '%' . $name . '%')
+            ->whereHas('attendances', function ($query) use ($month, $year) {
+                $query->whereMonth('date', $month)
+                      ->whereYear('date', $year);
+            })
+            ->get();
+
+        // Check if any employees were found
+        if ($employees->isEmpty()) {
+            return response()->json(['message' => 'No employees found for the given criteria'], 404);
         }
 
-        return SalariesResource::collection($employee);
+        // Return the collection of found employees
+        return SalariesResource::collection($employees);
     }
-
-
     public function calculateBonusDeduction( Request $request)
     {
         $validator = Validator::make($request->all(), [
-                    'month' => 'integer|between:1,12', 
-                    'year' => 'integer|min:2008',      
+                    'month' => 'integer|between:1,12',
+                    'year' => 'integer|min:2008',
                 ]);
                   $month = $request->input('month');
-        $year = $request->input('year');  
+        $year = $request->input('year');
         $employees = Employee::whereHas('attendances', function ($q) use ($month, $year) {
                             $q->whereMonth('date', $month)
                             ->whereYear('date', $year);
-                        
+
                     })->get();
         //  $employee = Employee::findOrFail($employeeId);
 
@@ -156,9 +139,9 @@ class SalariesController extends Controller
                     $employee->getWorkDaysAttribute($month, $year);
                     $employee->getAbsenceDaysAttribute($month, $year);
                     $employee->totalSalaryAmount($month, $year);
-                    $employee->calculateMonthlyBonusDeduction($month, $year); 
+                    $employee->calculateMonthlyBonusDeduction($month, $year);
                 });
- 
+
          return SalariesResource::collection($employees);
 
 }

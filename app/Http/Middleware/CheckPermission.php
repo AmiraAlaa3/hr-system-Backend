@@ -20,14 +20,12 @@ class CheckPermission
     {
         $user = $request->user();
         if ($user && $user->groups) {
-            $permissions = $user->groups->permissions; 
-            // dd($permission);
-    
+            $permissions = $user->groups->permissions;
+
             $permissionObject = $permissions->firstWhere('page', $permission);
-            
 
             if ($permissionObject && $permissionObject->$action === 'true') {
-                return $next($request); 
+                return $next($request);
         }
 
         return response()->json(['message' => 'User does not have access to perform this action.'], 403);
