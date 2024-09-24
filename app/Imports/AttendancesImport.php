@@ -19,9 +19,8 @@ class AttendancesImport implements ToCollection,WithHeadingRow
     */
     public function collection(Collection $rows)
 {
-    foreach ($rows as $row) 
+    foreach ($rows as $row)
     {
-        // dd($row);
         $attendance = Attendnce::where('employee_id', $row['employee_id'])
                                 ->where('date', $this->convertDate($row['date']))
                                 ->first();
