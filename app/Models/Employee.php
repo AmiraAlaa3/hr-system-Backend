@@ -192,10 +192,11 @@ class Employee extends Model
         $workEndTime = Carbon::createFromTimeString($this->check_out_time);
 
         $setting = $this->settings()->first();
-
+        // Get the bonus and deduction hours from settings
         $bonusHours = $setting ? $setting->bonusHours : 1;
         $deductionHours = $setting ? $setting->deductionsHours : 1;
 
+        // Initialize counters for minutes
         $bonusMinutes = 0;
         $earlyLeaveMinutes = 0;
         $deductionMinutes = 0;
@@ -205,32 +206,43 @@ class Employee extends Model
             $checkOutTime = $attendance->checkOUT ? Carbon::parse($attendance->checkOUT) : null;
 
             if ($checkInTime && $checkOutTime) {
+                // Deduct for late arrival
                 if ($checkInTime->greaterThan($workStartTime)) {
                     $deductionMinutes += $checkInTime->diffInMinutes($workStartTime);
-                    $totalDeduction += $deductionMinutes * $this->salaryPerMinute();
                 }
 
-                if ($checkOutTime->greaterThan($workEndTime)) {
-                    $bonusMinutes += $checkOutTime->diffInMinutes($workEndTime);
-                    $totalBonus += $bonusMinutes * $this->salaryPerMinute();
-                }
-                elseif ($checkOutTime->lessThan($workEndTime)) {
+                // Deduct for early leave, else add bonus for overtime
+                if ($checkOutTime->lessThan($workEndTime)) {
                     $earlyLeaveMinutes += $workEndTime->diffInMinutes($checkOutTime);
-                    $totalDeduction += $earlyLeaveMinutes * $this->salaryPerMinute();
+                } elseif ($checkOutTime->greaterThan($workEndTime)) {
+                    $bonusMinutes += $checkOutTime->diffInMinutes($workEndTime);
                 }
             }
         }
 
-        $totalBonus *= $bonusHours;
-        $totalDeduction *= $deductionHours;
+        // Calculate the total deduction and bonus with hours applied as multipliers
+        $totalBonus = ($bonusMinutes * $this->salaryPerMinute()) * $bonusHours;
+        $totalDeduction = (($earlyLeaveMinutes + $deductionMinutes) * $this->salaryPerMinute()) * $deductionHours;
 
         return [
             'total_bonus' => $totalBonus,
             'total_deduction' => $totalDeduction,
-            'bonus_hours' => $bonusMinutes / 60,
-            'deduction_hours' => ($earlyLeaveMinutes + $deductionMinutes) / 60,
+            'bonus_hours' => $this->formatHoursMinutes($bonusMinutes),
+            'deduction_hours' => $this->formatHoursMinutes($earlyLeaveMinutes + $deductionMinutes),
         ];
     }
+
+    /**
+     * Helper function to format minutes into HH:MM format
+     */
+    private function formatHoursMinutes($totalMinutes)
+    {
+        $hours = floor($totalMinutes / 60);
+        $minutes = $totalMinutes % 60;
+
+        return sprintf('%02d:%02d', $hours, $minutes);
+    }
+
 
 public function totalSalaryAmount($month = null, $year = null)
 {
